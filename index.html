@@ -26,7 +26,7 @@ h1{margin:0;font-size:28px}
 .label{font-weight:bold;margin-bottom:8px}
 .notes{margin-top:14px;background:#232938;padding:12px;border-radius:10px;line-height:1.5}
 .notes textarea{width:100%;margin-top:10px;min-height:100px;border:none;border-radius:8px;padding:10px;font-family:Arial,sans-serif;font-size:14px;box-sizing:border-box}
-.map{margin-top:15px}
+.map{margin-top:14px}
 .map img{width:100%;border-radius:10px;display:block}
 .back-row{display:flex;gap:10px;margin-top:16px}
 .back,.save{flex:1;padding:12px;text-align:center;border-radius:8px;cursor:pointer;font-weight:bold}
@@ -59,7 +59,7 @@ h1{margin:0;font-size:28px}
 </div>
 
 <script>
-const STORAGE_KEY = "mililani-attendant-captain-v3";
+const STORAGE_KEY = "mililani-attendant-captain-v4";
 const ALERTS_KEY = "mililani-attendant-alerts-open";
 
 const posts = {
@@ -108,7 +108,7 @@ function renderButtons(){
   const grid = document.getElementById("postGrid");
   grid.innerHTML = "";
   for(let i=1;i<=9;i++){
-    let btn = document.createElement("div");
+    const btn = document.createElement("div");
     btn.className = "post-btn";
     btn.innerHTML = "Post " + i;
     btn.onclick = function(){ openPost(i); };
@@ -188,15 +188,15 @@ function openPost(num){
         <div class="label">Shift Times / Assigned</div>
         ${scheduleHTML}
       </div>
+      <div class="map">
+        <div class="label">Post Location Reference</div>
+        <img src="${post.map}" alt="${post.title} map">
+      </div>
       <div class="notes">
         <strong>Captain Notes</strong>
         <textarea id="notesInput">${post.notes || ""}</textarea>
       </div>
       ${countHTML}
-      <div class="map">
-        <div class="label">Post Location Reference</div>
-        <img src="${post.map}" alt="${post.title} map">
-      </div>
       <div class="back-row">
         <div class="back" onclick="goBack()">Back to Posts</div>
         <div class="save" onclick="savePost(${num})">Save Notes</div>

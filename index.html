@@ -1,210 +1,192 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mililani Attendant Captain</title>
-<style>
-  body{
-    font-family:Arial, sans-serif;
-    background:#0b0b0b;
-    color:white;
-    margin:0;
-    padding:16px;
-  }
-
-  h1{
-    text-align:center;
-    margin:0 0 8px 0;
-    font-size:32px;
-  }
-
-  .subhead{
-    text-align:center;
-    color:#c7c7c7;
-    margin-bottom:18px;
-    font-size:14px;
-  }
-
-  .tabs{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin-bottom:16px;
-  }
-
-  .tab-btn{
-    background:#1f1f1f;
-    color:white;
-    border:1px solid #333;
-    border-radius:10px;
-    padding:10px 16px;
-    cursor:pointer;
-    font-size:14px;
-  }
-
-  .tab-btn.active{
-    background:#2d7ff9;
-    border-color:#2d7ff9;
-  }
-
-  .layout{
-    display:grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap:16px;
-  }
-
-  .panel{
-    background:#181818;
-    border:1px solid #2d2d2d;
-    border-radius:14px;
-    padding:14px;
-  }
-
-  .panel-title{
-    font-size:22px;
-    margin:0 0 12px 0;
-  }
-
-  .map-wrap{
-    position:relative;
-    width:100%;
-    min-height:320px;
-    background:#111;
-    border-radius:12px;
-    overflow:hidden;
-    border:1px solid #2d2d2d;
-  }
-
-  .map-wrap img{
-    width:100%;
-    display:block;
-    position:relative;
-    z-index:1;
-    pointer-events:none;
-  }
-
-  .map-fallback{
-    width:100%;
-    min-height:320px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#bbb;
-    text-align:center;
-    padding:20px;
-    position:relative;
-    z-index:1;
-    pointer-events:none;
-  }
-
-  .marker{
-    position:absolute;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:none;
-    background:#d71f1f;
-    color:white;
-    font-weight:bold;
-    font-size:12px;
-    cursor:pointer;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 0 2px white, 0 2px 8px rgba(0,0,0,0.5);
-    z-index:5;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .marker.active{
-    background:#ff5a5a;
-    transform:translate(-50%,-50%) scale(1.1);
-  }
-
-  .legend{
-    margin-top:12px;
-    color:#c9c9c9;
-    font-size:13px;
-    line-height:1.6;
-  }
-
-  label{
-    display:block;
-    margin:12px 0 6px 0;
-    font-weight:bold;
-  }
-
-  input, textarea{
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:none;
-    background:#f2f2f2;
-    color:#111;
-    font-size:14px;
-    box-sizing:border-box;
-  }
-
-  textarea{
-    min-height:110px;
-    resize:vertical;
-  }
-
-  .save-btn, .reset-btn{
-    margin-top:12px;
-    border:none;
-    border-radius:8px;
-    padding:10px 14px;
-    cursor:pointer;
-    font-size:14px;
-  }
-
-  .save-btn{
-    background:#2d7ff9;
-    color:white;
-    margin-right:8px;
-  }
-
-  .reset-btn{
-    background:#555;
-    color:white;
-  }
-
-  .count-box{
-    margin-top:14px;
-    background:#202020;
-    border:1px solid #333;
-    border-radius:10px;
-    padding:12px;
-  }
-
-  .address-box{
-    margin-bottom:14px;
-    background:#202020;
-    border:1px solid #333;
-    border-radius:10px;
-    padding:12px;
-    color:#ddd;
-    line-height:1.5;
-  }
-
-  .saved-note{
-    margin-top:10px;
-    color:#bcbcbc;
-    font-size:12px;
-  }
-
-  .hidden{
-    display:none;
-  }
-
-  @media (max-width: 960px){
-    .layout{
-      grid-template-columns:1fr;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mililani Attendant Captain</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#0b0b0b;
+      color:white;
+      margin:0;
+      padding:16px;
     }
-  }
-</style>
+
+    h1{
+      text-align:center;
+      margin:0 0 8px 0;
+      font-size:30px;
+    }
+
+    .subhead{
+      text-align:center;
+      color:#c7c7c7;
+      margin-bottom:18px;
+      font-size:14px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .tab-btn{
+      background:#1f1f1f;
+      color:white;
+      border:1px solid #333;
+      border-radius:10px;
+      padding:10px 16px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .tab-btn.active{
+      background:#2d7ff9;
+      border-color:#2d7ff9;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap:16px;
+    }
+
+    .panel{
+      background:#181818;
+      border:1px solid #2d2d2d;
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .panel-title{
+      font-size:22px;
+      margin:0 0 12px 0;
+    }
+
+    .map-wrap{
+      position:relative;
+      width:100%;
+      background:#111;
+      border-radius:12px;
+      overflow:hidden;
+      border:1px solid #2d2d2d;
+    }
+
+    .map-wrap img{
+      width:100%;
+      display:block;
+      position:relative;
+      z-index:1;
+      pointer-events:none;
+    }
+
+    .marker{
+      position:absolute;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      border:none;
+      background:#d71f1f;
+      cursor:pointer;
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 0 1.5px #fff, 0 1px 4px rgba(0,0,0,0.6);
+      z-index:5;
+      padding:0;
+    }
+
+    .marker.active{
+      background:#ff4f4f;
+      box-shadow:0 0 0 2px #fff, 0 1px 5px rgba(0,0,0,0.8);
+      transform:translate(-50%,-50%) scale(1.35);
+    }
+
+    .legend{
+      margin-top:12px;
+      color:#c9c9c9;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    label{
+      display:block;
+      margin:12px 0 6px 0;
+      font-weight:bold;
+    }
+
+    input, textarea{
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      border:none;
+      background:#f2f2f2;
+      color:#111;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+
+    textarea{
+      min-height:120px;
+      resize:vertical;
+    }
+
+    .save-btn, .reset-btn{
+      margin-top:12px;
+      border:none;
+      border-radius:8px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .save-btn{
+      background:#2d7ff9;
+      color:white;
+      margin-right:8px;
+    }
+
+    .reset-btn{
+      background:#555;
+      color:white;
+    }
+
+    .count-box{
+      margin-top:14px;
+      background:#202020;
+      border:1px solid #333;
+      border-radius:10px;
+      padding:12px;
+    }
+
+    .address-box{
+      margin-bottom:14px;
+      background:#202020;
+      border:1px solid #333;
+      border-radius:10px;
+      padding:12px;
+      color:#ddd;
+      line-height:1.5;
+    }
+
+    .saved-note{
+      margin-top:10px;
+      color:#bcbcbc;
+      font-size:12px;
+    }
+
+    .hidden{
+      display:none;
+    }
+
+    @media (max-width: 960px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -221,42 +203,26 @@
     <h2 class="panel-title" id="mapTitle">Ground Level Map</h2>
 
     <div class="map-wrap" id="groundMapWrap">
-      <img
-        src="https://i.imgur.com/4x0R4cX.png"
-        alt="Ground Level Map"
-        onerror="this.style.display='none'; document.getElementById('groundFallback').classList.remove('hidden');"
-      >
-      <div id="groundFallback" class="map-fallback hidden">
-        Ground level map image not loaded yet.<br>
-        The red post circles still work.
-      </div>
-
-      <button class="marker" id="marker-1" style="left:31%; top:74%;" onclick="openPost(1)">1</button>
-      <button class="marker" id="marker-2" style="left:48%; top:41%;" onclick="openPost(2)">2</button>
-      <button class="marker" id="marker-3" style="left:29%; top:48%;" onclick="openPost(3)">3</button>
-      <button class="marker" id="marker-4" style="left:65%; top:48%;" onclick="openPost(4)">4</button>
-      <button class="marker" id="marker-5" style="left:78%; top:56%;" onclick="openPost(5)">5</button>
-      <button class="marker" id="marker-6" style="left:55%; top:81%;" onclick="openPost(6)">6</button>
-      <button class="marker" id="marker-7" style="left:72%; top:36%;" onclick="openPost(7)">7</button>
+      <img src="https://i.imgur.com/Eo4M6V4.png" alt="Ground Level Map">
+      <!-- Ground markers based on your annotated screenshots -->
+      <button class="marker" id="marker-1" style="left:23.6%; top:82.2%;" onclick="openPost(1)" title="Post 1"></button>
+      <button class="marker" id="marker-2" style="left:49.0%; top:68.7%;" onclick="openPost(2)" title="Post 2"></button>
+      <button class="marker" id="marker-3" style="left:33.7%; top:34.0%;" onclick="openPost(3)" title="Post 3"></button>
+      <button class="marker" id="marker-4" style="left:64.8%; top:35.3%;" onclick="openPost(4)" title="Post 4"></button>
+      <button class="marker" id="marker-5" style="left:85.2%; top:72.0%;" onclick="openPost(5)" title="Post 5"></button>
+      <button class="marker" id="marker-6" style="left:58.8%; top:80.5%;" onclick="openPost(6)" title="Post 6"></button>
+      <button class="marker" id="marker-7" style="left:58.4%; top:75.6%;" onclick="openPost(7)" title="Post 7"></button>
     </div>
 
     <div class="map-wrap hidden" id="balconyMapWrap">
-      <img
-        src="https://i.imgur.com/fU8P2wM.png"
-        alt="Balcony Level Map"
-        onerror="this.style.display='none'; document.getElementById('balconyFallback').classList.remove('hidden');"
-      >
-      <div id="balconyFallback" class="map-fallback hidden">
-        Balcony level map image not loaded yet.<br>
-        The red post circles still work.
-      </div>
-
-      <button class="marker" id="marker-8" style="left:61%; top:72%;" onclick="openPost(8)">8</button>
-      <button class="marker" id="marker-9" style="left:58%; top:57%;" onclick="openPost(9)">9</button>
+      <img src="https://i.imgur.com/7mNn5h5.png" alt="Balcony Level Map">
+      <!-- Balcony markers based on your annotated screenshots -->
+      <button class="marker" id="marker-8" style="left:62.2%; top:75.2%;" onclick="openPost(8)" title="Post 8"></button>
+      <button class="marker" id="marker-9" style="left:56.0%; top:59.3%;" onclick="openPost(9)" title="Post 9"></button>
     </div>
 
     <div class="legend">
-      Tap a red post circle to open that post.<br>
+      Tap a red post dot to open that post.<br>
       Post 6: No evacuation toward basement.<br>
       Post 9: Count times are 11:30 AM and 1:50 PM.
     </div>
@@ -298,14 +264,14 @@
 </div>
 
 <script>
-const STORAGE_KEY = "mililani-attendant-map-v3";
+const STORAGE_KEY = "mililani-attendant-map-v4";
 
 const defaultPosts = {
   1: {
     title: "Post 1 – Lobby Entrance",
     subtitle: "2 Brothers Required",
     headerNote: "Team A: Grant Manalili, Charlie Omo • Team B: Joel Kiliona, Isaias Parrish",
-    assigned: "",
+    assigned: "Grant Manalili / Charlie Omo / Joel Kiliona / Esaias Parrish",
     notes: "",
     count1130: "",
     count150: ""
@@ -386,7 +352,6 @@ const defaultPosts = {
 
 let posts = loadPosts();
 let currentPost = 1;
-let currentTab = "ground";
 
 function loadPosts(){
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -403,7 +368,6 @@ function savePostsData(){
 }
 
 function showTab(tab){
-  currentTab = tab;
   document.getElementById("groundTabBtn").classList.toggle("active", tab === "ground");
   document.getElementById("balconyTabBtn").classList.toggle("active", tab === "balcony");
   document.getElementById("groundMapWrap").classList.toggle("hidden", tab !== "ground");
@@ -415,6 +379,12 @@ function openPost(postId){
   currentPost = postId;
   renderPost();
   renderMarkers();
+
+  if(currentPost <= 7){
+    showTab("ground");
+  } else {
+    showTab("balcony");
+  }
 }
 
 function renderMarkers(){
@@ -442,12 +412,6 @@ function renderPost(){
   } else {
     countSection.classList.add("hidden");
   }
-
-  if(currentPost <= 7){
-    showTab("ground");
-  } else {
-    showTab("balcony");
-  }
 }
 
 function savePost(){
@@ -471,8 +435,7 @@ function resetPost(){
   renderPost();
 }
 
-renderPost();
-renderMarkers();
+openPost(1);
 </script>
 
 </body>

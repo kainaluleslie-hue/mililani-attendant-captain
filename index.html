@@ -2,65 +2,189 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mililani Attendant Captain</title><style>
+
 body{
-font-family: Arial, sans-serif;
+font-family:Arial, sans-serif;
 background:#0b0b0b;
 color:white;
-text-align:center;
+margin:0;
 padding:20px;
 }
 
 h1{
-margin-bottom:30px;
+text-align:center;
+margin-bottom:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:15px;
 }
 
 .card{
+background:#1e1e1e;
+padding:15px;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.card:hover{
+background:#2a2a2a;
+}
+
+.panel{
+margin-top:20px;
 background:#1c1c1c;
 padding:20px;
-margin:12px;
-border-radius:12px;
-box-shadow:0 0 10px rgba(0,0,0,0.4);
+border-radius:10px;
+}
+
+input, textarea{
+width:100%;
+padding:8px;
+margin-top:6px;
+margin-bottom:10px;
+border-radius:6px;
+border:none;
 }
 
 button{
-padding:8px 16px;
-margin-top:10px;
+padding:8px 14px;
 border:none;
-border-radius:8px;
+border-radius:6px;
 background:#2d7ff9;
 color:white;
-font-size:14px;
+margin-top:8px;
 }
-</style></head><body><h1>Mililani Attendant Captain</h1><div class="card">
-<h2>Post 1 – Lobby Entrance</h2>
-<p>Team A: Grant Manalili / Charlie Omo</p>
-<p>Team B: Joel Kiliona / Isaias Parrish</p>
-</div><div class="card">
-<h2>Post 2 – Auditorium Entrance</h2>
-<p>Mark Foster / Erwin Pascua</p>
-</div><div class="card">
-<h2>Post 3 – Left Auditorium</h2>
-<p>Kawika Delacruz / Norman Ho‘omanawanui</p>
-</div><div class="card">
-<h2>Post 4 – Right Auditorium</h2>
-<p>Hiland Itelmong / Jourdan Manta</p>
-</div><div class="card">
-<h2>Post 5 – KH A Hallway</h2>
-<p>Logan Griffin / Rodney Bristol</p>
-</div><div class="card">
-<h2>Post 6 – Basement Stairs (Two Brothers Required)</h2>
-<p>Al Tiu / TBD</p>
-<p><i>No evacuation toward basement allowed</i></p>
-</div><div class="card">
-<h2>Post 7 – Top of Stairs</h2>
-<p>David Yamashita</p>
-<p>Sean Yarbenet (Tentative)</p>
-</div><div class="card">
-<h2>Post 8 – Elevator Area (Balcony Level)</h2>
-<p>Jordan Moananu / Dennis Maeda</p>
-</div><div class="card">
-<h2>Post 9 – Balcony Area</h2>
-<p>Nainoa Driver / Joey Cariaga</p>
-<p>Count Times: 11:30 AM | 1:50 PM</p>
-</div></body>
+
+.status{
+margin-top:10px;
+font-weight:bold;
+}
+
+.green{color:#00ff8c;}
+.yellow{color:#ffd000;}
+.red{color:#ff4b4b;}
+
+</style></head><body><h1>Mililani Attendant Captain</h1><div class="grid" id="postGrid"></div><div class="panel" id="panel" style="display:none">
+<h2 id="panelTitle"></h2><label>Assigned Brothers</label>
+<input id="brothers">
+
+<label>Captain Notes</label>
+
+<textarea id="notes"></textarea><button onclick="savePost()">Save</button>
+
+<div class="status" id="status"></div><button onclick="setStatus('green')">Post OK</button>
+<button onclick="setStatus('yellow')">Needs Help</button>
+<button onclick="setStatus('red')">Issue</button>
+
+</div><script>
+
+const posts = [
+
+{title:"Post 1 – Lobby Entrance"},
+{title:"Post 2 – Auditorium Entrance"},
+{title:"Post 3 – Left Auditorium"},
+{title:"Post 4 – Right Auditorium"},
+{title:"Post 5 – KH A Hallway"},
+{title:"Post 6 – Basement Stairs"},
+{title:"Post 7 – Top of Stairs"},
+{title:"Post 8 – Elevator Area (Balcony Level)"},
+{title:"Post 9 – Balcony Area"}
+
+]
+
+let currentPost = null
+
+function loadPosts(){
+
+const grid = document.getElementById("postGrid")
+
+grid.innerHTML=""
+
+posts.forEach((p,i)=>{
+
+const card=document.createElement("div")
+
+card.className="card"
+
+card.innerHTML="<h3>"+p.title+"</h3>"
+
+card.onclick=()=>openPost(i)
+
+grid.appendChild(card)
+
+})
+
+}
+
+function openPost(i){
+
+currentPost=i
+
+const data=JSON.parse(localStorage.getItem("post"+i)||"{}")
+
+document.getElementById("panel").style.display="block"
+
+document.getElementById("panelTitle").innerText=posts[i].title
+
+document.getElementById("brothers").value=data.brothers||""
+
+document.getElementById("notes").value=data.notes||""
+
+updateStatus(data.status)
+
+}
+
+function savePost(){
+
+const data={
+
+brothers:document.getElementById("brothers").value,
+
+notes:document.getElementById("notes").value,
+
+status:localStorage.getItem("status"+currentPost)
+
+}
+
+localStorage.setItem("post"+currentPost,JSON.stringify(data))
+
+alert("Saved")
+
+}
+
+function setStatus(color){
+
+localStorage.setItem("status"+currentPost,color)
+
+updateStatus(color)
+
+}
+
+function updateStatus(color){
+
+const s=document.getElementById("status")
+
+if(!color){
+
+s.innerText=""
+
+return
+
+}
+
+if(color==="green") s.innerHTML="<span class='green'>Post OK</span>"
+
+if(color==="yellow") s.innerHTML="<span class='yellow'>Needs Help</span>"
+
+if(color==="red") s.innerHTML="<span class='red'>Issue</span>"
+
+}
+
+loadPosts()
+
+</script></body>
 </html>

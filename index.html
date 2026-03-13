@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mililani Attendant Captain</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mililani Attendant Captain — Mission Control V10</title>
   <style>
     body{
       margin:0;
@@ -427,9 +427,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "mililani-attendant-captain-v9";
+    const STORAGE_KEY = "mililani-attendant-captain-v10";
     const ALERTS_KEY = "mililani-attendant-alerts-open";
-    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-v3";
+    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-v5";
 
     const defaultAlerts = [
       "Post 6 needs second brother on Al Tiu shifts.",
@@ -438,16 +438,31 @@
       "Tap a post to review schedule and location reference."
     ];
 
+    const imageMap = {
+      1: "groundmap(1).jpg",
+      2: "groundmap(2).jpg",
+      3: "groundmap(3).jpg",
+      4: "groundmap(4).jpg",
+      5: "groundmap(5).jpg",
+      6: "groundmap(6).jpg",
+      7: "groundmap(7).jpg",
+      8: "balconymap(1).jpg",
+      9: "balconymap(2).jpg"
+    };
+
+    /* Fine-tune these if you want to nudge the label box later.
+       labelX/labelY = top-left of red box
+       dotX/dotY     = red dot center */
     const overlayConfig = {
-      1: { map:"groundmap.jpg",  labelX:14, labelY:59, dotX:28, dotY:74 },
-      2: { map:"groundmap.jpg",  labelX:40, labelY:53, dotX:49, dotY:68 },
-      3: { map:"groundmap.jpg",  labelX:9,  labelY:18, dotX:34, dotY:34 },
-      4: { map:"groundmap.jpg",  labelX:61, labelY:18, dotX:65, dotY:35 },
-      5: { map:"groundmap.jpg",  labelX:66, labelY:63, dotX:85, dotY:72 },
-      6: { map:"groundmap.jpg",  labelX:28, labelY:72, dotX:59, dotY:81 },
-      7: { map:"groundmap.jpg",  labelX:61, labelY:63, dotX:58, dotY:76 },
-      8: { map:"balconymap.jpg", labelX:58, labelY:64, dotX:62, dotY:75 },
-      9: { map:"balconymap.jpg", labelX:29, labelY:46, dotX:56, dotY:59 }
+      1: { labelX:14, labelY:59, dotX:28, dotY:74 },
+      2: { labelX:40, labelY:53, dotX:49, dotY:68 },
+      3: { labelX:9,  labelY:18, dotX:34, dotY:34 },
+      4: { labelX:61, labelY:18, dotX:65, dotY:35 },
+      5: { labelX:66, labelY:63, dotX:85, dotY:72 },
+      6: { labelX:28, labelY:72, dotX:59, dotY:81 },
+      7: { labelX:61, labelY:63, dotX:58, dotY:76 },
+      8: { labelX:58, labelY:64, dotX:62, dotY:75 },
+      9: { labelX:29, labelY:46, dotX:56, dotY:59 }
     };
 
     const posts = {
@@ -529,7 +544,7 @@
           ["6:45 AM – 7:45 AM","Kepa Apolo & Zechariah Tubon"],
           ["7:45 AM – 9:20 AM","Al Tiu &"],
           ["9:20 AM – 10:55 AM","Kepa Apolo & Zechariah Tubon"],
-          ["10:55 AM – 12:10 PM","Al Tiu &"],
+          ["10:55 AM – 12:10 AM","Al Tiu &"],
           ["12:10 PM – 1:25 PM","Kepa Apolo & Zechariah Tubon (Lunch)"],
           ["1:25 PM – 2:40 PM","Al Tiu &"],
           ["2:40 PM – 3:40 PM","Kepa Apolo & Zechariah Tubon"],
@@ -708,12 +723,10 @@
 
       return `
         <svg class="map-svg" id="mapSvg" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
-
         <div class="overlay-label" id="overlayLabel" style="left:${cfg.labelX}%; top:${cfg.labelY}%;">
           <div class="overlay-title">POST ${num}</div>
           ${namesHtml}
         </div>
-
         <div class="overlay-dot" id="overlayDot" style="left:${cfg.dotX}%; top:${cfg.dotY}%;"></div>
       `;
     }
@@ -808,7 +821,7 @@
         `;
       }
 
-      const mapFile = overlayConfig[num].map;
+      const mapFile = imageMap[num];
       const overlayHTML = buildOverlayHTML(num);
 
       card.innerHTML = `
@@ -909,8 +922,8 @@
     }
 
     window.addEventListener("resize", function(){
-      const cardVisible = document.getElementById("postCard").style.display === "block";
-      if(cardVisible){
+      const visible = document.getElementById("postCard").style.display === "block";
+      if(visible){
         drawOverlayArrow();
       }
     });

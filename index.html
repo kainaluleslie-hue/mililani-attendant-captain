@@ -132,6 +132,10 @@
       background:#2d7ff9;
     }
 
+    .alert-btn:hover{
+      filter:brightness(1.08);
+    }
+
     .post-grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -265,6 +269,15 @@
       border-radius:10px;
     }
 
+    .map-svg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index:2;
+    }
+
     .overlay-label{
       position:absolute;
       background:#c81616;
@@ -287,14 +300,6 @@
 
     .overlay-name{
       white-space:nowrap;
-    }
-
-    .overlay-arrow{
-      position:absolute;
-      width:2px;
-      background:#111;
-      transform-origin:top left;
-      z-index:2;
     }
 
     .overlay-dot{
@@ -422,9 +427,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "mililani-attendant-captain-v8";
+    const STORAGE_KEY = "mililani-attendant-captain-v9";
     const ALERTS_KEY = "mililani-attendant-alerts-open";
-    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-v2";
+    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-v3";
 
     const defaultAlerts = [
       "Post 6 needs second brother on Al Tiu shifts.",
@@ -434,13 +439,13 @@
     ];
 
     const overlayConfig = {
-      1: { map:"groundmap.jpg", labelX:14, labelY:59, dotX:28, dotY:74 },
-      2: { map:"groundmap.jpg", labelX:40, labelY:53, dotX:49, dotY:68 },
-      3: { map:"groundmap.jpg", labelX:9,  labelY:18, dotX:34, dotY:34 },
-      4: { map:"groundmap.jpg", labelX:61, labelY:18, dotX:65, dotY:35 },
-      5: { map:"groundmap.jpg", labelX:66, labelY:63, dotX:85, dotY:72 },
-      6: { map:"groundmap.jpg", labelX:28, labelY:72, dotX:59, dotY:81 },
-      7: { map:"groundmap.jpg", labelX:61, labelY:63, dotX:58, dotY:76 },
+      1: { map:"groundmap.jpg",  labelX:14, labelY:59, dotX:28, dotY:74 },
+      2: { map:"groundmap.jpg",  labelX:40, labelY:53, dotX:49, dotY:68 },
+      3: { map:"groundmap.jpg",  labelX:9,  labelY:18, dotX:34, dotY:34 },
+      4: { map:"groundmap.jpg",  labelX:61, labelY:18, dotX:65, dotY:35 },
+      5: { map:"groundmap.jpg",  labelX:66, labelY:63, dotX:85, dotY:72 },
+      6: { map:"groundmap.jpg",  labelX:28, labelY:72, dotX:59, dotY:81 },
+      7: { map:"groundmap.jpg",  labelX:61, labelY:63, dotX:58, dotY:76 },
       8: { map:"balconymap.jpg", labelX:58, labelY:64, dotX:62, dotY:75 },
       9: { map:"balconymap.jpg", labelX:29, labelY:46, dotX:56, dotY:59 }
     };
@@ -675,11 +680,17 @@
       }
     }
 
+    function normalizeName(name){
+      return String(name || "")
+        .replace(/\s*\(Lunch\)\s*/gi, "")
+        .trim();
+    }
+
     function getOverlayNames(num){
       const schedule = posts[num].schedule || [];
       const seen = [];
       schedule.forEach(function(row){
-        const name = (row[1] || "").trim();
+        const name = normalizeName(row[1]);
         if(name && seen.indexOf(name) === -1){
           seen.push(name);
         }
@@ -691,22 +702,74 @@
       const cfg = overlayConfig[num];
       const names = getOverlayNames(num);
 
-      const dx = cfg.dotX - cfg.labelX;
-      const dy = cfg.dotY - cfg.labelY;
-      const len = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
       const namesHtml = names.map(function(name){
         return '<div class="overlay-name">' + escapeHtmlText(name) + '</div>';
       }).join("");
 
       return `
-        <div class="overlay-label" style="left:${cfg.labelX}%; top:${cfg.labelY}%;">
+        <svg class="map-svg" id="mapSvg" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+
+        <div class="overlay-label" id="overlayLabel" style="left:${cfg.labelX}%; top:${cfg.labelY}%;">
           <div class="overlay-title">POST ${num}</div>
           ${namesHtml}
         </div>
-        <div class="overlay-arrow" style="left:${cfg.labelX + 8}%; top:${cfg.labelY + 10}%; height:${len}%; transform:rotate(${angle}deg);"></div>
-        <div class="overlay-dot" style="left:${cfg.dotX}%; top:${cfg.dotY}%;"></div>
+
+        <div class="overlay-dot" id="overlayDot" style="left:${cfg.dotX}%; top:${cfg.dotY}%;"></div>
+      `;
+    }
+
+    function drawOverlayArrow(){
+      const wrap = document.querySelector(".map-wrap");
+      const label = document.getElementById("overlayLabel");
+      const dot = document.getElementById("overlayDot");
+      const svg = document.getElementById("mapSvg");
+
+      if(!wrap || !label || !dot || !svg) return;
+
+      const wrapRect = wrap.getBoundingClientRect();
+      const labelRect = label.getBoundingClientRect();
+      const dotRect = dot.getBoundingClientRect();
+
+      const dotX = (dotRect.left + dotRect.width / 2) - wrapRect.left;
+      const dotY = (dotRect.top + dotRect.height / 2) - wrapRect.top;
+
+      const left = labelRect.left - wrapRect.left;
+      const right = labelRect.right - wrapRect.left;
+      const top = labelRect.top - wrapRect.top;
+      const bottom = labelRect.bottom - wrapRect.top;
+      const cx = (left + right) / 2;
+      const cy = (top + bottom) / 2;
+
+      let startX = cx;
+      let startY = cy;
+
+      const dx = dotX - cx;
+      const dy = dotY - cy;
+
+      if(Math.abs(dx) > Math.abs(dy)){
+        startX = dx > 0 ? right : left;
+        startY = cy;
+      } else {
+        startX = cx;
+        startY = dy > 0 ? bottom : top;
+      }
+
+      const w = wrapRect.width;
+      const h = wrapRect.height;
+
+      const x1 = (startX / w) * 1000;
+      const y1 = (startY / h) * 1000;
+      const x2 = (dotX / w) * 1000;
+      const y2 = (dotY / h) * 1000;
+
+      svg.innerHTML = `
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
+            <polygon points="0 0, 10 4, 0 8" fill="#111"></polygon>
+          </marker>
+        </defs>
+        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+              stroke="#111" stroke-width="3" marker-end="url(#arrowhead)"></line>
       `;
     }
 
@@ -788,6 +851,10 @@
           </div>
         </div>
       `;
+
+      requestAnimationFrame(function(){
+        drawOverlayArrow();
+      });
     }
 
     function savePost(num){
@@ -840,6 +907,13 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
+
+    window.addEventListener("resize", function(){
+      const cardVisible = document.getElementById("postCard").style.display === "block";
+      if(cardVisible){
+        drawOverlayArrow();
+      }
+    });
 
     loadSavedData();
     renderButtons();

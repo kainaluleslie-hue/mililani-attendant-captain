@@ -92,13 +92,44 @@
       display:block;
     }
 
-    .alert-item{
+    .alert-editor{
+      width:100%;
+      min-height:140px;
+      border:none;
+      border-radius:10px;
+      padding:12px;
+      font-family:Arial,sans-serif;
+      font-size:15px;
+      box-sizing:border-box;
+      resize:vertical;
+      background:#f4f6fa;
+      color:#111;
+    }
+
+    .alert-help{
+      margin-top:8px;
+      color:#9aa3b2;
+      font-size:13px;
+    }
+
+    .alert-actions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+
+    .alert-btn{
       background:#232938;
-      border-left:4px solid #2d7ff9;
-      padding:10px 12px;
       border-radius:8px;
-      margin-bottom:10px;
-      line-height:1.45;
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:bold;
+      user-select:none;
+    }
+
+    .alert-btn.primary{
+      background:#2d7ff9;
     }
 
     .post-grid{
@@ -220,11 +251,61 @@
       margin-top:14px;
     }
 
-    .map img{
+    .map-wrap{
+      position:relative;
       width:100%;
       border-radius:10px;
-      display:block;
+      overflow:hidden;
       background:#fff;
+    }
+
+    .map-wrap img{
+      width:100%;
+      display:block;
+      border-radius:10px;
+    }
+
+    .overlay-label{
+      position:absolute;
+      background:#c81616;
+      color:#fff;
+      border-radius:10px;
+      padding:8px 10px;
+      min-width:150px;
+      box-shadow:0 4px 10px rgba(0,0,0,.35);
+      font-size:12px;
+      line-height:1.25;
+      z-index:3;
+    }
+
+    .overlay-title{
+      font-weight:bold;
+      margin-bottom:4px;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+    }
+
+    .overlay-name{
+      white-space:nowrap;
+    }
+
+    .overlay-arrow{
+      position:absolute;
+      width:2px;
+      background:#111;
+      transform-origin:top left;
+      z-index:2;
+    }
+
+    .overlay-dot{
+      position:absolute;
+      width:10px;
+      height:10px;
+      background:#c81616;
+      border-radius:50%;
+      box-shadow:0 0 0 2px #111;
+      z-index:4;
+      transform:translate(-50%,-50%);
     }
 
     .notes{
@@ -300,6 +381,11 @@
       .back-top{
         min-width:100%;
       }
+
+      .overlay-label{
+        min-width:120px;
+        font-size:11px;
+      }
     }
   </style>
 </head>
@@ -321,7 +407,12 @@
           <div id="alertChevron">▾</div>
         </div>
         <div class="alert-body" id="alertBody">
-          <div id="alertList"></div>
+          <textarea id="alertEditor" class="alert-editor"></textarea>
+          <div class="alert-help">One alert per line. Edit anything you like, then save.</div>
+          <div class="alert-actions">
+            <div class="alert-btn primary" onclick="saveAlerts()">Save Alerts</div>
+            <div class="alert-btn" onclick="resetAlerts()">Reset Default Alerts</div>
+          </div>
         </div>
       </div>
     </div>
@@ -331,13 +422,32 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "mililani-attendant-captain-v6";
+    const STORAGE_KEY = "mililani-attendant-captain-v8";
     const ALERTS_KEY = "mililani-attendant-alerts-open";
+    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-v2";
+
+    const defaultAlerts = [
+      "Post 6 needs second brother on Al Tiu shifts.",
+      "Post 7 has tentative backup note.",
+      "Balcony counts due at 11:30 AM and 1:50 PM.",
+      "Tap a post to review schedule and location reference."
+    ];
+
+    const overlayConfig = {
+      1: { map:"groundmap.jpg", labelX:14, labelY:59, dotX:28, dotY:74 },
+      2: { map:"groundmap.jpg", labelX:40, labelY:53, dotX:49, dotY:68 },
+      3: { map:"groundmap.jpg", labelX:9,  labelY:18, dotX:34, dotY:34 },
+      4: { map:"groundmap.jpg", labelX:61, labelY:18, dotX:65, dotY:35 },
+      5: { map:"groundmap.jpg", labelX:66, labelY:63, dotX:85, dotY:72 },
+      6: { map:"groundmap.jpg", labelX:28, labelY:72, dotX:59, dotY:81 },
+      7: { map:"groundmap.jpg", labelX:61, labelY:63, dotX:58, dotY:76 },
+      8: { map:"balconymap.jpg", labelX:58, labelY:64, dotX:62, dotY:75 },
+      9: { map:"balconymap.jpg", labelX:29, labelY:46, dotX:56, dotY:59 }
+    };
 
     const posts = {
       1:{
         title:"Post 1 – Lobby Entrance",
-        map:"bkm1.jpg",
         details:"Team A: Grant Manalili, Charlie Omo\nTeam B: Joel Kiliona, Esaias Parrish",
         notes:"",
         schedule:[
@@ -352,7 +462,6 @@
       },
       2:{
         title:"Post 2 – Auditorium Entrance",
-        map:"bkm2.jpg",
         details:"",
         notes:"",
         schedule:[
@@ -367,7 +476,6 @@
       },
       3:{
         title:"Post 3 – Left Auditorium",
-        map:"bkm2.jpg",
         details:"",
         notes:"",
         schedule:[
@@ -382,7 +490,6 @@
       },
       4:{
         title:"Post 4 – Right Auditorium",
-        map:"bkm2.jpg",
         details:"",
         notes:"",
         schedule:[
@@ -397,7 +504,6 @@
       },
       5:{
         title:"Post 5 – KH A Hallway",
-        map:"bkm3.jpg",
         details:"",
         notes:"",
         schedule:[
@@ -412,7 +518,6 @@
       },
       6:{
         title:"Post 6 – Basement Stairs",
-        map:"bkm4.jpg",
         details:"Evacuation note: No evacuation toward basement.",
         notes:"",
         schedule:[
@@ -428,7 +533,6 @@
       },
       7:{
         title:"Post 7 – Top of Stairs",
-        map:"bkm4.jpg",
         details:"Tentative Backup:",
         notes:"",
         schedule:[
@@ -443,7 +547,6 @@
       },
       8:{
         title:"Post 8 – Elevator Area (Balcony Level)",
-        map:"bkm5.jpg",
         details:"",
         notes:"",
         schedule:[
@@ -458,7 +561,6 @@
       },
       9:{
         title:"Post 9 – Balcony",
-        map:"bkm5.jpg",
         details:"Balcony attendance count times:\nCount #1 — 11:30 AM\nCount #2 — 1:50 PM\nSend totals to Captain",
         notes:"",
         count1:"",
@@ -509,6 +611,27 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     }
 
+    function getAlertsText(){
+      return localStorage.getItem(ALERTS_TEXT_KEY) || defaultAlerts.join("\n");
+    }
+
+    function saveAlerts(){
+      const editor = document.getElementById("alertEditor");
+      if(!editor) return;
+      localStorage.setItem(ALERTS_TEXT_KEY, editor.value);
+      alert("Captain Alerts saved");
+    }
+
+    function resetAlerts(){
+      const text = defaultAlerts.join("\n");
+      localStorage.setItem(ALERTS_TEXT_KEY, text);
+      const editor = document.getElementById("alertEditor");
+      if(editor){
+        editor.value = text;
+      }
+      alert("Captain Alerts reset");
+    }
+
     function renderButtons(){
       const grid = document.getElementById("postGrid");
       grid.innerHTML = "";
@@ -523,16 +646,10 @@
     }
 
     function renderAlerts(){
-      const alerts = [
-        "Post 6 needs second brother on Al Tiu shifts.",
-        "Post 7 has tentative backup note.",
-        "Balcony counts due at 11:30 AM and 1:50 PM.",
-        "Tap a post to review schedule and location reference."
-      ];
-
-      document.getElementById("alertList").innerHTML = alerts.map(function(alert){
-        return '<div class="alert-item">' + alert + '</div>';
-      }).join("");
+      const editor = document.getElementById("alertEditor");
+      if(editor){
+        editor.value = getAlertsText();
+      }
     }
 
     function toggleAlerts(){
@@ -556,6 +673,41 @@
         body.classList.remove("open");
         chev.textContent = "▾";
       }
+    }
+
+    function getOverlayNames(num){
+      const schedule = posts[num].schedule || [];
+      const seen = [];
+      schedule.forEach(function(row){
+        const name = (row[1] || "").trim();
+        if(name && seen.indexOf(name) === -1){
+          seen.push(name);
+        }
+      });
+      return seen.slice(0,4);
+    }
+
+    function buildOverlayHTML(num){
+      const cfg = overlayConfig[num];
+      const names = getOverlayNames(num);
+
+      const dx = cfg.dotX - cfg.labelX;
+      const dy = cfg.dotY - cfg.labelY;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      const namesHtml = names.map(function(name){
+        return '<div class="overlay-name">' + escapeHtmlText(name) + '</div>';
+      }).join("");
+
+      return `
+        <div class="overlay-label" style="left:${cfg.labelX}%; top:${cfg.labelY}%;">
+          <div class="overlay-title">POST ${num}</div>
+          ${namesHtml}
+        </div>
+        <div class="overlay-arrow" style="left:${cfg.labelX + 8}%; top:${cfg.labelY + 10}%; height:${len}%; transform:rotate(${angle}deg);"></div>
+        <div class="overlay-dot" style="left:${cfg.dotX}%; top:${cfg.dotY}%;"></div>
+      `;
     }
 
     function openPost(num){
@@ -593,6 +745,9 @@
         `;
       }
 
+      const mapFile = overlayConfig[num].map;
+      const overlayHTML = buildOverlayHTML(num);
+
       card.innerHTML = `
         <div class="card">
           <h2>${post.title}</h2>
@@ -615,7 +770,10 @@
 
           <div class="map">
             <div class="label">Post Location Reference</div>
-            <img src="${post.map}" alt="${post.title} map">
+            <div class="map-wrap">
+              <img src="${mapFile}" alt="${post.title} map">
+              ${overlayHTML}
+            </div>
           </div>
 
           <div class="notes">
@@ -658,6 +816,7 @@
       }
 
       saveData();
+      openPost(num);
       alert("Saved");
     }
 

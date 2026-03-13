@@ -1,190 +1,419 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mililani Attendant Captain</title><style>
+<title>Mililani Attendant Captain</title>
+<style>
+  body{
+    font-family:Arial, sans-serif;
+    background:#0b0b0b;
+    color:white;
+    margin:0;
+    padding:16px;
+  }
 
-body{
-font-family:Arial, sans-serif;
-background:#0b0b0b;
-color:white;
-margin:0;
-padding:20px;
-}
+  h1{
+    text-align:center;
+    margin:0 0 8px 0;
+    font-size:32px;
+  }
 
-h1{
-text-align:center;
-margin-bottom:20px;
-}
+  .subhead{
+    text-align:center;
+    color:#c7c7c7;
+    margin-bottom:18px;
+    font-size:14px;
+  }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:15px;
-}
+  .tabs{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
 
-.card{
-background:#1e1e1e;
-padding:15px;
-border-radius:10px;
-cursor:pointer;
-transition:0.2s;
-}
+  .tab-btn{
+    background:#1f1f1f;
+    color:white;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:10px 16px;
+    cursor:pointer;
+    font-size:14px;
+  }
 
-.card:hover{
-background:#2a2a2a;
-}
+  .tab-btn.active{
+    background:#2d7ff9;
+    border-color:#2d7ff9;
+  }
 
-.panel{
-margin-top:20px;
-background:#1c1c1c;
-padding:20px;
-border-radius:10px;
-}
+  .layout{
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap:16px;
+  }
 
-input, textarea{
-width:100%;
-padding:8px;
-margin-top:6px;
-margin-bottom:10px;
-border-radius:6px;
-border:none;
-}
+  .panel{
+    background:#181818;
+    border:1px solid #2d2d2d;
+    border-radius:14px;
+    padding:14px;
+  }
 
-button{
-padding:8px 14px;
-border:none;
-border-radius:6px;
-background:#2d7ff9;
-color:white;
-margin-top:8px;
-}
+  .panel-title{
+    font-size:22px;
+    margin:0 0 12px 0;
+  }
 
-.status{
-margin-top:10px;
-font-weight:bold;
-}
+  .map-wrap{
+    position:relative;
+    width:100%;
+    background:#111;
+    border-radius:12px;
+    overflow:hidden;
+  }
 
-.green{color:#00ff8c;}
-.yellow{color:#ffd000;}
-.red{color:#ff4b4b;}
+  .map-wrap img{
+    width:100%;
+    display:block;
+  }
 
-</style></head><body><h1>Mililani Attendant Captain</h1><div class="grid" id="postGrid"></div><div class="panel" id="panel" style="display:none">
-<h2 id="panelTitle"></h2><label>Assigned Brothers</label>
-<input id="brothers">
+  .marker{
+    position:absolute;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    border:none;
+    background:#d71f1f;
+    color:white;
+    font-weight:bold;
+    font-size:12px;
+    cursor:pointer;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 0 2px white, 0 2px 8px rgba(0,0,0,0.5);
+  }
 
-<label>Captain Notes</label>
+  .marker.active{
+    background:#ff5a5a;
+    transform:translate(-50%,-50%) scale(1.1);
+  }
 
-<textarea id="notes"></textarea><button onclick="savePost()">Save</button>
+  .legend{
+    margin-top:12px;
+    color:#c9c9c9;
+    font-size:13px;
+    line-height:1.6;
+  }
 
-<div class="status" id="status"></div><button onclick="setStatus('green')">Post OK</button>
-<button onclick="setStatus('yellow')">Needs Help</button>
-<button onclick="setStatus('red')">Issue</button>
+  label{
+    display:block;
+    margin:12px 0 6px 0;
+    font-weight:bold;
+  }
 
-</div><script>
+  input, textarea{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    background:#f2f2f2;
+    color:#111;
+    font-size:14px;
+    box-sizing:border-box;
+  }
 
-const posts = [
+  textarea{
+    min-height:110px;
+    resize:vertical;
+  }
 
-{title:"Post 1 – Lobby Entrance"},
-{title:"Post 2 – Auditorium Entrance"},
-{title:"Post 3 – Left Auditorium"},
-{title:"Post 4 – Right Auditorium"},
-{title:"Post 5 – KH A Hallway"},
-{title:"Post 6 – Basement Stairs"},
-{title:"Post 7 – Top of Stairs"},
-{title:"Post 8 – Elevator Area (Balcony Level)"},
-{title:"Post 9 – Balcony Area"}
+  .save-btn, .reset-btn{
+    margin-top:12px;
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-size:14px;
+  }
 
-]
+  .save-btn{
+    background:#2d7ff9;
+    color:white;
+    margin-right:8px;
+  }
 
-let currentPost = null
+  .reset-btn{
+    background:#555;
+    color:white;
+  }
+
+  .count-box{
+    margin-top:14px;
+    background:#202020;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:12px;
+  }
+
+  .address-box{
+    margin-bottom:14px;
+    background:#202020;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:12px;
+    color:#ddd;
+    line-height:1.5;
+  }
+
+  .saved-note{
+    margin-top:10px;
+    color:#bcbcbc;
+    font-size:12px;
+  }
+
+  .hidden{
+    display:none;
+  }
+
+  @media (max-width: 960px){
+    .layout{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Mililani Attendant Captain</h1>
+<div class="subhead">239 Palii Street, Mililani, HI 96789</div>
+
+<div class="tabs">
+  <button class="tab-btn active" id="groundTabBtn" onclick="showTab('ground')">Ground Level</button>
+  <button class="tab-btn" id="balconyTabBtn" onclick="showTab('balcony')">Balcony Level</button>
+</div>
+
+<div class="layout">
+  <div class="panel">
+    <h2 class="panel-title" id="mapTitle">Ground Level Map</h2>
+
+    <div class="map-wrap" id="groundMapWrap">
+      <img src="https://i.imgur.com/4x0R4cX.png" alt="Ground Level Map" onerror="this.src=''; this.parentNode.innerHTML='<div style=&quot;padding:30px; text-align:center; color:#bbb;&quot;>Upload your ground-floor map image later if needed.</div>';">
+      <!-- Ground level markers -->
+      <button class="marker" id="marker-1" style="left:31%; top:74%;" onclick="openPost(1)">1</button>
+      <button class="marker" id="marker-2" style="left:48%; top:41%;" onclick="openPost(2)">2</button>
+      <button class="marker" id="marker-3" style="left:29%; top:48%;" onclick="openPost(3)">3</button>
+      <button class="marker" id="marker-4" style="left:65%; top:48%;" onclick="openPost(4)">4</button>
+      <button class="marker" id="marker-5" style="left:78%; top:56%;" onclick="openPost(5)">5</button>
+      <button class="marker" id="marker-6" style="left:55%; top:81%;" onclick="openPost(6)">6</button>
+      <button class="marker" id="marker-7" style="left:72%; top:36%;" onclick="openPost(7)">7</button>
+    </div>
+
+    <div class="map-wrap hidden" id="balconyMapWrap">
+      <img src="https://i.imgur.com/fU8P2wM.png" alt="Balcony Level Map" onerror="this.src=''; this.parentNode.innerHTML='<div style=&quot;padding:30px; text-align:center; color:#bbb;&quot;>Upload your balcony map image later if needed.</div>';">
+      <!-- Balcony markers -->
+      <button class="marker" id="marker-8" style="left:61%; top:72%;" onclick="openPost(8)">8</button>
+      <button class="marker" id="marker-9" style="left:58%; top:57%;" onclick="openPost(9)">9</button>
+    </div>
+
+    <div class="legend">
+      Tap a red post circle to open that post.<br>
+      Post 6: No evacuation toward basement.<br>
+      Post 9: Count times are 11:30 AM and 1:50 PM.
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="address-box">
+      <strong>Assembly Hall Address</strong><br>
+      Mililani Assembly Hall<br>
+      239 Palii Street<br>
+      Mililani, HI 96789
+    </div>
+
+    <h2 class="panel-title" id="postTitle">Post 1 – Lobby Entrance</h2>
+    <div id="postSubtitle" style="color:#cfcfcf; margin-bottom:10px;"></div>
+    <div id="postHeaderNote" style="color:#d8d8d8; margin-bottom:10px; line-height:1.5;"></div>
+
+    <label>Assigned Brothers</label>
+    <input id="assignedBrothers" type="text">
+
+    <div id="countSection" class="count-box hidden">
+      <strong>Balcony Counts</strong>
+
+      <label>11:30 AM Count</label>
+      <input id="count1130" type="text">
+
+      <label>1:50 PM Count</label>
+      <input id="count150" type="text">
+    </div>
+
+    <label>Captain Notes</label>
+    <textarea id="captainNotes" placeholder="Write notes here..."></textarea>
+
+    <button class="save-btn" onclick="savePost()">Save</button>
+    <button class="reset-btn" onclick="resetPost()">Reset Post</button>
+
+    <div class="saved-note">Changes save on this device.</div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "mililani-attendant-map-v3";
+
+const defaultPosts = {
+  1: {
+    title: "Post 1 – Lobby Entrance",
+    subtitle: "2 Brothers Required",
+    headerNote: "Team A: Grant Manalili, Charlie Omo • Team B: Joel Kiliona, Isaias Parrish",
+    assigned: "",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  2: {
+    title: "Post 2 – Auditorium Entrance",
+    subtitle: "",
+    headerNote: "",
+    assigned: "Erwin Pascua / Mark Foster",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  3: {
+    title: "Post 3 – Left Auditorium",
+    subtitle: "",
+    headerNote: "",
+    assigned: "Kawika Delacruz / Norman Ho‘omanawanui",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  4: {
+    title: "Post 4 – Right Auditorium",
+    subtitle: "",
+    headerNote: "",
+    assigned: "Hiland Itelmong / Jourdan Manta",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  5: {
+    title: "Post 5 – KH A Hallway",
+    subtitle: "",
+    headerNote: "",
+    assigned: "Logan Griffin / Rodney Bristol",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  6: {
+    title: "Post 6 – Basement Stairs",
+    subtitle: "2 Brothers Required",
+    headerNote: "Evacuation Note: In the event of an evacuation, no one should evacuate toward the basement.",
+    assigned: "Kepa Apolo & Zechariah Tubon / Al Tiu &",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  7: {
+    title: "Post 7 – Top of Stairs",
+    subtitle: "",
+    headerNote: "Sean Yarbenet is tentative. Tentative Backup:",
+    assigned: "David Yamashita / Sean Yarbenet",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  8: {
+    title: "Post 8 – Elevator Area",
+    subtitle: "Balcony Level",
+    headerNote: "",
+    assigned: "Jordan Moananu / Dennis Maeda",
+    notes: "",
+    count1130: "",
+    count150: ""
+  },
+  9: {
+    title: "Post 9 – Balcony Area",
+    subtitle: "Attendance Counts",
+    headerNote: "Count #1 — 11:30 AM • Count #2 — 1:50 PM",
+    assigned: "Nainoa Driver / Joey Cariaga",
+    notes: "",
+    count1130: "",
+    count150: ""
+  }
+};
+
+let posts = loadPosts();
+let currentPost = 1;
+let currentTab = "ground";
 
 function loadPosts(){
-
-const grid = document.getElementById("postGrid")
-
-grid.innerHTML=""
-
-posts.forEach((p,i)=>{
-
-const card=document.createElement("div")
-
-card.className="card"
-
-card.innerHTML="<h3>"+p.title+"</h3>"
-
-card.onclick=()=>openPost(i)
-
-grid.appendChild(card)
-
-})
-
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    try {
+      return JSON.parse(saved);
+    } catch(e){}
+  }
+  return JSON.parse(JSON.stringify(defaultPosts));
 }
 
-function openPost(i){
+function savePostsData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+}
 
-currentPost=i
+function showTab(tab){
+  currentTab = tab;
+  document.getElementById("groundTabBtn").classList.toggle("active", tab === "ground");
+  document.getElementById("balconyTabBtn").classList.toggle("active", tab === "balcony");
+  document.getElementById("groundMapWrap").classList.toggle("hidden", tab !== "ground");
+  document.getElementById("balconyMapWrap").classList.toggle("hidden", tab !== "balcony");
+  document.getElementById("mapTitle").textContent = tab === "ground" ? "Ground Level Map" : "Balcony Level Map";
+}
 
-const data=JSON.parse(localStorage.getItem("post"+i)||"{}")
+function openPost(postId){
+  currentPost = postId;
+  renderPost();
+  renderMarkers();
+}
 
-document.getElementById("panel").style.display="block"
+function renderMarkers(){
+  for(let i=1;i<=9;i++){
+    const marker = document.getElementById("marker-" + i);
+    if(marker){
+      marker.classList.toggle("active", i === currentPost);
+    }
+  }
+}
 
-document.getElementById("panelTitle").innerText=posts[i].title
+function renderPost(){
+  const post = posts[currentPost];
+  document.getElementById("postTitle").textContent = post.title;
+  document.getElementById("postSubtitle").textContent = post.subtitle || "";
+  document.getElementById("postHeaderNote").textContent = post.headerNote || "";
+  document.getElementById("assignedBrothers").value = post.assigned || "";
+  document.getElementById("captainNotes").value = post.notes || "";
 
-document.getElementById("brothers").value=data.brothers||""
+  const countSection = document.getElementById("countSection");
+  if(currentPost === 9){
+    countSection.classList.remove("hidden");
+    document.getElementById("count1130").value = post.count1130 || "";
+    document.getElementById("count150").value = post.count150 || "";
+  } else {
+    countSection.classList.add("hidden");
+  }
 
-document.getElementById("notes").value=data.notes||""
-
-updateStatus(data.status)
-
+  if(currentPost <= 7){
+    showTab("ground");
+  } else {
+    showTab("balcony");
+  }
 }
 
 function savePost(){
+  posts[currentPost].assigned = document.getElementById("assignedBrothers").value;
+  posts[currentPost].notes = document.getElementById("captainNotes").value;
 
-const data={
-
-brothers:document.getElementById("brothers").value,
-
-notes:document.getElementById("notes").value,
-
-status:localStorage.getItem("status"+currentPost)
-
-}
-
-localStorage.setItem("post"+currentPost,JSON.stringify(data))
-
-alert("Saved")
-
-}
-
-function setStatus(color){
-
-localStorage.setItem("status"+currentPost,color)
-
-updateStatus(color)
-
-}
-
-function updateStatus(color){
-
-const s=document.getElementById("status")
-
-if(!color){
-
-s.innerText=""
-
-return
-
-}
-
-if(color==="green") s.innerHTML="<span class='green'>Post OK</span>"
-
-if(color==="yellow") s.innerHTML="<span class='yellow'>Needs Help</span>"
-
-if(color==="red") s.innerHTML="<span class='red'>Issue</span>"
-
-}
-
-loadPosts()
-
-</script></body>
-</html>
+  if(currentPost === 9){
+    posts[currentPost].count1130 = document.getElementBy

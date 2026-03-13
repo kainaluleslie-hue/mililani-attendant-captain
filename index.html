@@ -3,19 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mililani Attendant Captain — Mission Control V10</title>
+  <title>Mililani Attendant Captain</title>
   <style>
+    :root{
+      --bg:#0f1115;
+      --panel:#181c26;
+      --panel-2:#232938;
+      --panel-3:#1d2433;
+      --header:#151922;
+      --line:#2c3245;
+      --text:#ffffff;
+      --muted:#9aa3b2;
+      --blue:#2d7ff9;
+      --blue-hover:#3b8cff;
+      --button:#2a3145;
+      --button-hover:#35405c;
+      --input-bg:#f4f6fa;
+      --input-text:#111111;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
     body{
       margin:0;
       font-family:Arial,sans-serif;
-      background:#0f1115;
-      color:#fff;
+      background:var(--bg);
+      color:var(--text);
     }
 
     header{
       text-align:center;
       padding:20px;
-      background:#151922;
+      background:var(--header);
     }
 
     h1{
@@ -24,13 +45,13 @@
     }
 
     .sub{
-      color:#9aa3b2;
+      color:var(--muted);
       margin-top:5px;
     }
 
     .container{
-      max-width:900px;
-      margin:auto;
+      max-width:960px;
+      margin:0 auto;
       padding:20px;
     }
 
@@ -43,7 +64,7 @@
     }
 
     .back-top{
-      background:#2d7ff9;
+      background:var(--blue);
       padding:16px 26px;
       border-radius:12px;
       cursor:pointer;
@@ -59,15 +80,15 @@
     }
 
     .back-top:hover{
-      background:#3b8cff;
+      background:var(--blue-hover);
     }
 
     .alert-shell{
-      background:#181c26;
+      background:var(--panel);
       border-radius:12px;
       margin-bottom:18px;
       overflow:hidden;
-      border:1px solid #2c3245;
+      border:1px solid var(--line);
       flex:1;
       min-width:260px;
     }
@@ -84,7 +105,7 @@
 
     .alert-body{
       padding:14px 16px;
-      border-top:1px solid #2c3245;
+      border-top:1px solid var(--line);
       display:none;
     }
 
@@ -102,13 +123,13 @@
       font-size:15px;
       box-sizing:border-box;
       resize:vertical;
-      background:#f4f6fa;
-      color:#111;
+      background:var(--input-bg);
+      color:var(--input-text);
     }
 
     .alert-help{
       margin-top:8px;
-      color:#9aa3b2;
+      color:var(--muted);
       font-size:13px;
     }
 
@@ -120,7 +141,7 @@
     }
 
     .alert-btn{
-      background:#232938;
+      background:var(--panel-2);
       border-radius:8px;
       padding:12px 14px;
       cursor:pointer;
@@ -129,7 +150,7 @@
     }
 
     .alert-btn.primary{
-      background:#2d7ff9;
+      background:var(--blue);
     }
 
     .alert-btn:hover{
@@ -143,7 +164,7 @@
     }
 
     .post-btn{
-      background:#232938;
+      background:var(--panel-2);
       padding:16px 14px;
       border-radius:10px;
       text-align:center;
@@ -155,11 +176,11 @@
     }
 
     .post-btn:hover{
-      background:#2a3145;
+      background:#2f384f;
     }
 
     .card{
-      background:#181c26;
+      background:var(--panel);
       padding:18px;
       border-radius:12px;
       margin-top:20px;
@@ -172,7 +193,7 @@
     }
 
     .section-box{
-      background:#232938;
+      background:var(--panel-2);
       padding:14px;
       border-radius:10px;
       margin-top:14px;
@@ -184,9 +205,9 @@
       font-size:15px;
     }
 
-    .details-box textarea{
+    .details-box textarea,
+    .notes textarea{
       width:100%;
-      min-height:70px;
       border:none;
       border-radius:8px;
       padding:10px;
@@ -194,13 +215,19 @@
       font-size:15px;
       box-sizing:border-box;
       resize:vertical;
+      background:var(--input-bg);
+      color:var(--input-text);
+    }
+
+    .details-box textarea{
+      min-height:70px;
     }
 
     .schedule-wrap{
       margin-top:8px;
       border-radius:10px;
       overflow:hidden;
-      border:1px solid #2c3245;
+      border:1px solid var(--line);
     }
 
     .schedule-head{
@@ -210,7 +237,7 @@
       background:#1c2231;
       padding:12px 14px;
       font-weight:bold;
-      border-bottom:1px solid #2c3245;
+      border-bottom:1px solid var(--line);
     }
 
     .shift-row{
@@ -218,7 +245,7 @@
       grid-template-columns:1.15fr 1fr;
       gap:12px;
       padding:10px 14px;
-      border-bottom:1px solid #2c3245;
+      border-bottom:1px solid var(--line);
       align-items:center;
     }
 
@@ -227,11 +254,11 @@
     }
 
     .shift-row:nth-child(odd){
-      background:#232938;
+      background:var(--panel-2);
     }
 
     .shift-row:nth-child(even){
-      background:#1d2433;
+      background:var(--panel-3);
     }
 
     .time-cell{
@@ -247,8 +274,8 @@
       font-family:Arial,sans-serif;
       font-size:15px;
       box-sizing:border-box;
-      background:#f4f6fa;
-      color:#111;
+      background:var(--input-bg);
+      color:var(--input-text);
     }
 
     .map{
@@ -256,11 +283,11 @@
     }
 
     .map-wrap{
-      position:relative;
       width:100%;
       border-radius:10px;
       overflow:hidden;
-      background:#fff;
+      background:#ffffff;
+      border:1px solid rgba(0,0,0,.08);
     }
 
     .map-wrap img{
@@ -269,95 +296,22 @@
       border-radius:10px;
     }
 
-    .map-svg{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      pointer-events:none;
-      z-index:2;
-    }
-
-    .overlay-label{
-      position:absolute;
-      background:#c81616;
-      color:#fff;
-      border-radius:10px;
-      padding:8px 10px;
-      min-width:150px;
-      box-shadow:0 4px 10px rgba(0,0,0,.35);
-      font-size:12px;
-      line-height:1.25;
-      z-index:3;
-    }
-
-    .overlay-title{
-      font-weight:bold;
-      margin-bottom:4px;
-      text-transform:uppercase;
-      letter-spacing:.3px;
-    }
-
-    .overlay-name{
-      white-space:nowrap;
-    }
-
-    .overlay-dot{
-      position:absolute;
-      width:10px;
-      height:10px;
-      background:#c81616;
-      border-radius:50%;
-      box-shadow:0 0 0 2px #111;
-      z-index:4;
-      transform:translate(-50%,-50%);
-    }
-
     .notes{
       margin-top:14px;
-      background:#232938;
+      background:var(--panel-2);
       padding:12px;
       border-radius:10px;
       line-height:1.5;
     }
 
     .notes textarea{
-      width:100%;
       margin-top:10px;
-      min-height:100px;
-      border:none;
-      border-radius:8px;
-      padding:10px;
-      font-family:Arial,sans-serif;
-      font-size:14px;
-      box-sizing:border-box;
-      resize:vertical;
-    }
-
-    .back-row{
-      display:flex;
-      gap:10px;
-      margin-top:16px;
-    }
-
-    .save{
-      flex:1;
-      padding:14px 12px;
-      text-align:center;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:bold;
-      background:#2a3145;
-      user-select:none;
-    }
-
-    .save:hover{
-      background:#35405c;
+      min-height:110px;
     }
 
     .count-box{
       margin-top:14px;
-      background:#232938;
+      background:var(--panel-2);
       padding:12px;
       border-radius:10px;
     }
@@ -371,6 +325,29 @@
       border-radius:8px;
       box-sizing:border-box;
       font-size:14px;
+      background:var(--input-bg);
+      color:var(--input-text);
+    }
+
+    .action-row{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .save{
+      flex:1;
+      padding:14px 12px;
+      text-align:center;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:bold;
+      background:var(--button);
+      user-select:none;
+    }
+
+    .save:hover{
+      background:var(--button-hover);
     }
 
     @media (max-width:700px){
@@ -385,11 +362,6 @@
 
       .back-top{
         min-width:100%;
-      }
-
-      .overlay-label{
-        min-width:120px;
-        font-size:11px;
       }
     }
   </style>
@@ -427,9 +399,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "mililani-attendant-captain-v10";
-    const ALERTS_KEY = "mililani-attendant-alerts-open";
-    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-v5";
+    const STORAGE_KEY = "mililani-attendant-captain-clean-v1";
+    const ALERTS_KEY = "mililani-attendant-alerts-open-clean";
+    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-clean";
 
     const defaultAlerts = [
       "Post 6 needs second brother on Al Tiu shifts.",
@@ -450,179 +422,164 @@
       9: "balconymap(2).jpg"
     };
 
-    /* Fine-tune these if you want to nudge the label box later.
-       labelX/labelY = top-left of red box
-       dotX/dotY     = red dot center */
-    const overlayConfig = {
-  1: { labelX:14, labelY:56, dotX:18.5, dotY:78.5 },
-  2: { labelX:44, labelY:50, dotX:33.8, dotY:67.8 },
-  3: { labelX:7,  labelY:14, dotX:36.0, dotY:36.2 },
-  4: { labelX:61, labelY:17, dotX:33.8, dotY:67.8 },
-  5: { labelX:50, labelY:63, dotX:78.8, dotY:46.8 },
-  6: { labelX:16, labelY:69, dotX:30.8, dotY:77.8 },
-  7: { labelX:55, labelY:60, dotX:30.8, dotY:77.8 },
-  8: { labelX:58, labelY:58, dotX:18.5, dotY:58.5 },
-  9: { labelX:14, labelY:50, dotX:42.0, dotY:63.2 }
-};
-
     const posts = {
-      1:{
-        title:"Post 1 – Lobby Entrance",
-        details:"Team A: Grant Manalili, Charlie Omo\nTeam B: Joel Kiliona, Esaias Parrish",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Team A"],
-          ["9:20 AM – 10:55 AM","Team B"],
-          ["10:55 AM – 12:10 PM","Team A"],
-          ["12:10 PM – 1:25 PM","Team B (Lunch)"],
-          ["1:25 PM – 2:40 PM","Team A"],
-          ["2:40 PM – 3:40 PM","Team B"],
-          ["3:40 PM – TBD","Team A"]
+      1: {
+        title: "Post 1 – Lobby Entrance",
+        details: "2 Brothers Required",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Team A"],
+          ["9:20 AM – 10:55 AM", "Team B"],
+          ["10:55 AM – 12:10 PM", "Team A"],
+          ["12:10 PM – 1:25 PM", "Team B (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Team A"],
+          ["2:40 PM – 3:40 PM", "Team B"],
+          ["3:40 PM – TBD", "Team A"]
         ]
       },
-      2:{
-        title:"Post 2 – Auditorium Entrance",
-        details:"",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Erwin Pascua"],
-          ["9:20 AM – 10:55 AM","Mark Foster"],
-          ["10:55 AM – 12:10 PM","Erwin Pascua"],
-          ["12:10 PM – 1:25 PM","Mark Foster (Lunch)"],
-          ["1:25 PM – 2:40 PM","Erwin Pascua"],
-          ["2:40 PM – 3:40 PM","Mark Foster"],
-          ["3:40 PM – TBD","Erwin Pascua"]
+      2: {
+        title: "Post 2 – Auditorium Entrance",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Erwin Pascua"],
+          ["9:20 AM – 10:55 AM", "Mark Foster"],
+          ["10:55 AM – 12:10 PM", "Erwin Pascua"],
+          ["12:10 PM – 1:25 PM", "Mark Foster (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Erwin Pascua"],
+          ["2:40 PM – 3:40 PM", "Mark Foster"],
+          ["3:40 PM – TBD", "Erwin Pascua"]
         ]
       },
-      3:{
-        title:"Post 3 – Left Auditorium",
-        details:"",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Kawika Delacruz"],
-          ["9:20 AM – 10:55 AM","Norman Ho'omanawanui"],
-          ["10:55 AM – 12:10 PM","Kawika Delacruz"],
-          ["12:10 PM – 1:25 PM","Norman Ho'omanawanui (Lunch)"],
-          ["1:25 PM – 2:40 PM","Kawika Delacruz"],
-          ["2:40 PM – 3:40 PM","Norman Ho'omanawanui"],
-          ["3:40 PM – TBD","Kawika Delacruz"]
+      3: {
+        title: "Post 3 – Left Auditorium",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Kawika Delacruz"],
+          ["9:20 AM – 10:55 AM", "Norman Ho'omanawanui"],
+          ["10:55 AM – 12:10 PM", "Kawika Delacruz"],
+          ["12:10 PM – 1:25 PM", "Norman Ho'omanawanui (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Kawika Delacruz"],
+          ["2:40 PM – 3:40 PM", "Norman Ho'omanawanui"],
+          ["3:40 PM – TBD", "Kawika Delacruz"]
         ]
       },
-      4:{
-        title:"Post 4 – Right Auditorium",
-        details:"",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Hiland Itelmong"],
-          ["9:20 AM – 10:55 AM","Jourdan Manta"],
-          ["10:55 AM – 12:10 PM","Hiland Itelmong"],
-          ["12:10 PM – 1:25 PM","Jourdan Manta (Lunch)"],
-          ["1:25 PM – 2:40 PM","Hiland Itelmong"],
-          ["2:40 PM – 3:40 PM","Jourdan Manta"],
-          ["3:40 PM – TBD","Hiland Itelmong"]
+      4: {
+        title: "Post 4 – Right Auditorium",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Hiland Itelmong"],
+          ["9:20 AM – 10:55 AM", "Jourdan Manta"],
+          ["10:55 AM – 12:10 PM", "Hiland Itelmong"],
+          ["12:10 PM – 1:25 PM", "Jourdan Manta (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Hiland Itelmong"],
+          ["2:40 PM – 3:40 PM", "Jourdan Manta"],
+          ["3:40 PM – TBD", "Hiland Itelmong"]
         ]
       },
-      5:{
-        title:"Post 5 – KH A Hallway",
-        details:"",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Logan Griffin"],
-          ["9:20 AM – 10:55 AM","Rodney Bristol"],
-          ["10:55 AM – 12:10 PM","Logan Griffin"],
-          ["12:10 PM – 1:25 PM","Rodney Bristol (Lunch)"],
-          ["1:25 PM – 2:40 PM","Logan Griffin"],
-          ["2:40 PM – 3:40 PM","Rodney Bristol"],
-          ["3:40 PM – TBD","Logan Griffin"]
+      5: {
+        title: "Post 5 – KH A Hallway",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Logan Griffin"],
+          ["9:20 AM – 10:55 AM", "Rodney Bristol"],
+          ["10:55 AM – 12:10 PM", "Logan Griffin"],
+          ["12:10 PM – 1:25 PM", "Rodney Bristol (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Logan Griffin"],
+          ["2:40 PM – 3:40 PM", "Rodney Bristol"],
+          ["3:40 PM – TBD", "Logan Griffin"]
         ]
       },
-      6:{
-        title:"Post 6 – Basement Stairs",
-        details:"Evacuation note: No evacuation toward basement.",
-        notes:"",
-        schedule:[
-          ["6:45 AM – 7:45 AM","Kepa Apolo & Zechariah Tubon"],
-          ["7:45 AM – 9:20 AM","Al Tiu &"],
-          ["9:20 AM – 10:55 AM","Kepa Apolo & Zechariah Tubon"],
-          ["10:55 AM – 12:10 AM","Al Tiu &"],
-          ["12:10 PM – 1:25 PM","Kepa Apolo & Zechariah Tubon (Lunch)"],
-          ["1:25 PM – 2:40 PM","Al Tiu &"],
-          ["2:40 PM – 3:40 PM","Kepa Apolo & Zechariah Tubon"],
-          ["3:40 PM – TBD","Al Tiu &"]
+      6: {
+        title: "Post 6 – Basement Stairs",
+        details: "2 Brothers Required",
+        notes: "",
+        schedule: [
+          ["6:45 AM – 7:45 AM", "Kepa Apolo & Zechariah Tubon"],
+          ["7:45 AM – 9:20 AM", "Al Tiu &"],
+          ["9:20 AM – 10:55 AM", "Kepa Apolo & Zechariah Tubon"],
+          ["10:55 AM – 12:10 PM", "Al Tiu &"],
+          ["12:10 PM – 1:25 PM", "Kepa Apolo & Zechariah Tubon (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Al Tiu &"],
+          ["2:40 PM – 3:40 PM", "Kepa Apolo & Zechariah Tubon"],
+          ["3:40 PM – TBD", "Al Tiu &"]
         ]
       },
-      7:{
-        title:"Post 7 – Top of Stairs",
-        details:"Tentative Backup:",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","David Yamashita"],
-          ["9:20 AM – 10:55 AM","Sean Yarbenet"],
-          ["10:55 AM – 12:10 PM","David Yamashita"],
-          ["12:10 PM – 1:25 PM","Sean Yarbenet (Lunch)"],
-          ["1:25 PM – 2:40 PM","David Yamashita"],
-          ["2:40 PM – 3:40 PM","Sean Yarbenet"],
-          ["3:40 PM – TBD","David Yamashita"]
+      7: {
+        title: "Post 7 – Top of Stairs",
+        details: "Tentative Backup:",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "David Yamashita"],
+          ["9:20 AM – 10:55 AM", "Sean Yarbenet"],
+          ["10:55 AM – 12:10 PM", "David Yamashita"],
+          ["12:10 PM – 1:25 PM", "Sean Yarbenet (Lunch)"],
+          ["1:25 PM – 2:40 PM", "David Yamashita"],
+          ["2:40 PM – 3:40 PM", "Sean Yarbenet"],
+          ["3:40 PM – TBD", "David Yamashita"]
         ]
       },
-      8:{
-        title:"Post 8 – Elevator Area (Balcony Level)",
-        details:"",
-        notes:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Jordan Moananu"],
-          ["9:20 AM – 10:55 AM","Dennis Maeda"],
-          ["10:55 AM – 12:10 PM","Jordan Moananu"],
-          ["12:10 PM – 1:25 PM","Dennis Maeda (Lunch)"],
-          ["1:25 PM – 2:40 PM","Jordan Moananu"],
-          ["2:40 PM – 3:40 PM","Dennis Maeda"],
-          ["3:40 PM – TBD","Jordan Moananu"]
+      8: {
+        title: "Post 8 – Elevator Area (Balcony Level)",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Jordan Moananu"],
+          ["9:20 AM – 10:55 AM", "Dennis Maeda"],
+          ["10:55 AM – 12:10 PM", "Jordan Moananu"],
+          ["12:10 PM – 1:25 PM", "Dennis Maeda (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Jordan Moananu"],
+          ["2:40 PM – 3:40 PM", "Dennis Maeda"],
+          ["3:40 PM – TBD", "Jordan Moananu"]
         ]
       },
-      9:{
-        title:"Post 9 – Balcony",
-        details:"Balcony attendance count times:\nCount #1 — 11:30 AM\nCount #2 — 1:50 PM\nSend totals to Captain",
-        notes:"",
-        count1:"",
-        count2:"",
-        schedule:[
-          ["7:45 AM – 9:20 AM","Nainoa Driver"],
-          ["9:20 AM – 10:55 AM","Joey Cariaga"],
-          ["10:55 AM – 12:10 PM","Nainoa Driver"],
-          ["12:10 PM – 1:25 PM","Joey Cariaga (Lunch)"],
-          ["1:25 PM – 2:40 PM","Nainoa Driver"],
-          ["2:40 PM – 3:40 PM","Joey Cariaga"],
-          ["3:40 PM – TBD","Nainoa Driver"]
+      9: {
+        title: "Post 9 – Balcony",
+        details: "Balcony attendance count times:\nCount #1 — 11:30 AM\nCount #2 — 1:50 PM\nSend totals to Captain",
+        notes: "",
+        count1: "",
+        count2: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Nainoa Driver"],
+          ["9:20 AM – 10:55 AM", "Joey Cariaga"],
+          ["10:55 AM – 12:10 PM", "Nainoa Driver"],
+          ["12:10 PM – 1:25 PM", "Joey Cariaga (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Nainoa Driver"],
+          ["2:40 PM – 3:40 PM", "Joey Cariaga"],
+          ["3:40 PM – TBD", "Nainoa Driver"]
         ]
       }
     };
 
     function loadSavedData(){
       const saved = localStorage.getItem(STORAGE_KEY);
-      if(saved){
-        try{
-          const parsed = JSON.parse(saved);
-          Object.keys(parsed).forEach(function(key){
-            if(posts[key]){
-              posts[key].notes = parsed[key].notes || "";
-              posts[key].details = parsed[key].details !== undefined ? parsed[key].details : posts[key].details;
-              posts[key].schedule = parsed[key].schedule || posts[key].schedule;
-              if(posts[key].count1 !== undefined){
-                posts[key].count1 = parsed[key].count1 || "";
-                posts[key].count2 = parsed[key].count2 || "";
-              }
+      if(!saved) return;
+
+      try{
+        const parsed = JSON.parse(saved);
+        Object.keys(parsed).forEach(function(key){
+          if(posts[key]){
+            posts[key].details = parsed[key].details !== undefined ? parsed[key].details : posts[key].details;
+            posts[key].notes = parsed[key].notes || "";
+            posts[key].schedule = parsed[key].schedule || posts[key].schedule;
+            if(posts[key].count1 !== undefined){
+              posts[key].count1 = parsed[key].count1 || "";
+              posts[key].count2 = parsed[key].count2 || "";
             }
-          });
-        }catch(e){}
-      }
+          }
+        });
+      }catch(e){}
     }
 
     function saveData(){
       const payload = {};
       Object.keys(posts).forEach(function(key){
         payload[key] = {
-          notes: posts[key].notes || "",
           details: posts[key].details || "",
+          notes: posts[key].notes || "",
           schedule: posts[key].schedule || [],
           count1: posts[key].count1 || "",
           count2: posts[key].count2 || ""
@@ -652,19 +609,6 @@
       alert("Captain Alerts reset");
     }
 
-    function renderButtons(){
-      const grid = document.getElementById("postGrid");
-      grid.innerHTML = "";
-
-      for(let i=1;i<=9;i++){
-        const btn = document.createElement("div");
-        btn.className = "post-btn";
-        btn.innerHTML = "Post " + i;
-        btn.onclick = function(){ openPost(i); };
-        grid.appendChild(btn);
-      }
-    }
-
     function renderAlerts(){
       const editor = document.getElementById("alertEditor");
       if(editor){
@@ -689,101 +633,25 @@
       if(state === "open"){
         body.classList.add("open");
         chev.textContent = "▴";
-      } else {
+      }else{
         body.classList.remove("open");
         chev.textContent = "▾";
       }
     }
 
-    function normalizeName(name){
-      return String(name || "")
-        .replace(/\s*\(Lunch\)\s*/gi, "")
-        .trim();
-    }
+    function renderButtons(){
+      const grid = document.getElementById("postGrid");
+      grid.innerHTML = "";
 
-    function getOverlayNames(num){
-      const schedule = posts[num].schedule || [];
-      const seen = [];
-      schedule.forEach(function(row){
-        const name = normalizeName(row[1]);
-        if(name && seen.indexOf(name) === -1){
-          seen.push(name);
-        }
-      });
-      return seen.slice(0,4);
-    }
-
-    function buildOverlayHTML(num){
-      const cfg = overlayConfig[num];
-      const names = getOverlayNames(num);
-
-      const namesHtml = names.map(function(name){
-        return '<div class="overlay-name">' + escapeHtmlText(name) + '</div>';
-      }).join("");
-
-      return `
-        <svg class="map-svg" id="mapSvg" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
-        <div class="overlay-label" id="overlayLabel" style="left:${cfg.labelX}%; top:${cfg.labelY}%;">
-          <div class="overlay-title">POST ${num}</div>
-          ${namesHtml}
-        </div>
-        <div class="overlay-dot" id="overlayDot" style="left:${cfg.dotX}%; top:${cfg.dotY}%;"></div>
-      `;
-    }
-
-    function drawOverlayArrow(){
-      const wrap = document.querySelector(".map-wrap");
-      const label = document.getElementById("overlayLabel");
-      const dot = document.getElementById("overlayDot");
-      const svg = document.getElementById("mapSvg");
-
-      if(!wrap || !label || !dot || !svg) return;
-
-      const wrapRect = wrap.getBoundingClientRect();
-      const labelRect = label.getBoundingClientRect();
-      const dotRect = dot.getBoundingClientRect();
-
-      const dotX = (dotRect.left + dotRect.width / 2) - wrapRect.left;
-      const dotY = (dotRect.top + dotRect.height / 2) - wrapRect.top;
-
-      const left = labelRect.left - wrapRect.left;
-      const right = labelRect.right - wrapRect.left;
-      const top = labelRect.top - wrapRect.top;
-      const bottom = labelRect.bottom - wrapRect.top;
-      const cx = (left + right) / 2;
-      const cy = (top + bottom) / 2;
-
-      let startX = cx;
-      let startY = cy;
-
-      const dx = dotX - cx;
-      const dy = dotY - cy;
-
-      if(Math.abs(dx) > Math.abs(dy)){
-        startX = dx > 0 ? right : left;
-        startY = cy;
-      } else {
-        startX = cx;
-        startY = dy > 0 ? bottom : top;
+      for(let i = 1; i <= 9; i++){
+        const btn = document.createElement("div");
+        btn.className = "post-btn";
+        btn.textContent = "Post " + i;
+        btn.onclick = function(){
+          openPost(i);
+        };
+        grid.appendChild(btn);
       }
-
-      const w = wrapRect.width;
-      const h = wrapRect.height;
-
-      const x1 = (startX / w) * 1000;
-      const y1 = (startY / h) * 1000;
-      const x2 = (dotX / w) * 1000;
-      const y2 = (dotY / h) * 1000;
-
-      svg.innerHTML = `
-        <defs>
-          <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">
-            <polygon points="0 0, 10 4, 0 8" fill="#111"></polygon>
-          </marker>
-        </defs>
-        <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
-              stroke="#111" stroke-width="3" marker-end="url(#arrowhead)"></line>
-      `;
     }
 
     function openPost(num){
@@ -800,9 +668,14 @@
       post.schedule.forEach(function(item, index){
         scheduleHTML += `
           <div class="shift-row">
-            <div class="time-cell">${item[0]}</div>
+            <div class="time-cell">${escapeHtmlText(item[0])}</div>
             <div>
-              <input class="assigned-input" type="text" id="assigned-${index}" value="${escapeHtmlAttr(item[1])}">
+              <input
+                class="assigned-input"
+                type="text"
+                id="assigned-${index}"
+                value="${escapeHtmlAttr(item[1])}"
+              />
             </div>
           </div>
         `;
@@ -814,19 +687,18 @@
           <div class="count-box">
             <div class="label">Balcony Count Entry</div>
             <div>11:30 AM Count</div>
-            <input type="text" id="count1Input" value="${escapeHtmlAttr(post.count1 || "")}">
+            <input type="text" id="count1Input" value="${escapeHtmlAttr(post.count1 || "")}" />
             <div>1:50 PM Count</div>
-            <input type="text" id="count2Input" value="${escapeHtmlAttr(post.count2 || "")}">
+            <input type="text" id="count2Input" value="${escapeHtmlAttr(post.count2 || "")}" />
           </div>
         `;
       }
 
       const mapFile = imageMap[num];
-      const overlayHTML = buildOverlayHTML(num);
 
       card.innerHTML = `
         <div class="card">
-          <h2>${post.title}</h2>
+          <h2>${escapeHtmlText(post.title)}</h2>
 
           <div class="section-box details-box">
             <div class="label">Post Details</div>
@@ -847,8 +719,7 @@
           <div class="map">
             <div class="label">Post Location Reference</div>
             <div class="map-wrap">
-              <img src="${mapFile}" alt="${post.title} map">
-              ${overlayHTML}
+              <img src="${mapFile}" alt="${escapeHtmlAttr(post.title)} map">
             </div>
           </div>
 
@@ -859,26 +730,23 @@
 
           ${countHTML}
 
-          <div class="back-row">
+          <div class="action-row">
             <div class="save" onclick="savePost(${num})">Save Changes</div>
           </div>
         </div>
       `;
-
-      requestAnimationFrame(function(){
-        drawOverlayArrow();
-      });
     }
 
     function savePost(num){
       const post = posts[num];
 
       const detailsInput = document.getElementById("detailsInput");
+      const notesInput = document.getElementById("notesInput");
+
       if(detailsInput){
         post.details = detailsInput.value;
       }
 
-      const notesInput = document.getElementById("notesInput");
       if(notesInput){
         post.notes = notesInput.value;
       }
@@ -896,7 +764,6 @@
       }
 
       saveData();
-      openPost(num);
       alert("Saved");
     }
 
@@ -906,14 +773,6 @@
       document.getElementById("topBack").style.display = "none";
     }
 
-    function escapeHtmlAttr(str){
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
     function escapeHtmlText(str){
       return String(str)
         .replace(/&/g, "&amp;")
@@ -921,12 +780,13 @@
         .replace(/>/g, "&gt;");
     }
 
-    window.addEventListener("resize", function(){
-      const visible = document.getElementById("postCard").style.display === "block";
-      if(visible){
-        drawOverlayArrow();
-      }
-    });
+    function escapeHtmlAttr(str){
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
 
     loadSavedData();
     renderButtons();

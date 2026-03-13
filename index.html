@@ -69,20 +69,39 @@
   .map-wrap{
     position:relative;
     width:100%;
+    min-height:320px;
     background:#111;
     border-radius:12px;
     overflow:hidden;
+    border:1px solid #2d2d2d;
   }
 
   .map-wrap img{
     width:100%;
     display:block;
+    position:relative;
+    z-index:1;
+    pointer-events:none;
+  }
+
+  .map-fallback{
+    width:100%;
+    min-height:320px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#bbb;
+    text-align:center;
+    padding:20px;
+    position:relative;
+    z-index:1;
+    pointer-events:none;
   }
 
   .marker{
     position:absolute;
-    width:32px;
-    height:32px;
+    width:34px;
+    height:34px;
     border-radius:50%;
     border:none;
     background:#d71f1f;
@@ -92,6 +111,10 @@
     cursor:pointer;
     transform:translate(-50%,-50%);
     box-shadow:0 0 0 2px white, 0 2px 8px rgba(0,0,0,0.5);
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
 
   .marker.active{
@@ -198,8 +221,16 @@
     <h2 class="panel-title" id="mapTitle">Ground Level Map</h2>
 
     <div class="map-wrap" id="groundMapWrap">
-      <img src="https://i.imgur.com/4x0R4cX.png" alt="Ground Level Map" onerror="this.src=''; this.parentNode.innerHTML='<div style=&quot;padding:30px; text-align:center; color:#bbb;&quot;>Upload your ground-floor map image later if needed.</div>';">
-      <!-- Ground level markers -->
+      <img
+        src="https://i.imgur.com/4x0R4cX.png"
+        alt="Ground Level Map"
+        onerror="this.style.display='none'; document.getElementById('groundFallback').classList.remove('hidden');"
+      >
+      <div id="groundFallback" class="map-fallback hidden">
+        Ground level map image not loaded yet.<br>
+        The red post circles still work.
+      </div>
+
       <button class="marker" id="marker-1" style="left:31%; top:74%;" onclick="openPost(1)">1</button>
       <button class="marker" id="marker-2" style="left:48%; top:41%;" onclick="openPost(2)">2</button>
       <button class="marker" id="marker-3" style="left:29%; top:48%;" onclick="openPost(3)">3</button>
@@ -210,8 +241,16 @@
     </div>
 
     <div class="map-wrap hidden" id="balconyMapWrap">
-      <img src="https://i.imgur.com/fU8P2wM.png" alt="Balcony Level Map" onerror="this.src=''; this.parentNode.innerHTML='<div style=&quot;padding:30px; text-align:center; color:#bbb;&quot;>Upload your balcony map image later if needed.</div>';">
-      <!-- Balcony markers -->
+      <img
+        src="https://i.imgur.com/fU8P2wM.png"
+        alt="Balcony Level Map"
+        onerror="this.style.display='none'; document.getElementById('balconyFallback').classList.remove('hidden');"
+      >
+      <div id="balconyFallback" class="map-fallback hidden">
+        Balcony level map image not loaded yet.<br>
+        The red post circles still work.
+      </div>
+
       <button class="marker" id="marker-8" style="left:61%; top:72%;" onclick="openPost(8)">8</button>
       <button class="marker" id="marker-9" style="left:58%; top:57%;" onclick="openPost(9)">9</button>
     </div>
@@ -379,7 +418,7 @@ function openPost(postId){
 }
 
 function renderMarkers(){
-  for(let i=1;i<=9;i++){
+  for(let i = 1; i <= 9; i++){
     const marker = document.getElementById("marker-" + i);
     if(marker){
       marker.classList.toggle("active", i === currentPost);
@@ -416,4 +455,25 @@ function savePost(){
   posts[currentPost].notes = document.getElementById("captainNotes").value;
 
   if(currentPost === 9){
-    posts[currentPost].count1130 = document.getElementBy
+    posts[currentPost].count1130 = document.getElementById("count1130").value;
+    posts[currentPost].count150 = document.getElementById("count150").value;
+  }
+
+  savePostsData();
+  alert("Saved");
+}
+
+function resetPost(){
+  const ok = confirm("Reset this post back to default?");
+  if(!ok) return;
+  posts[currentPost] = JSON.parse(JSON.stringify(defaultPosts[currentPost]));
+  savePostsData();
+  renderPost();
+}
+
+renderPost();
+renderMarkers();
+</script>
+
+</body>
+</html>

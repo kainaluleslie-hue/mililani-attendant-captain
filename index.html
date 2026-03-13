@@ -1,786 +1,691 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mililani Attendant Captain</title>
-<style>
-  :root{
-    --bg:#0b0b0b;
-    --panel:#171717;
-    --panel2:#202020;
-    --line:#2f2f2f;
-    --text:#f5f5f5;
-    --muted:#b8b8b8;
-    --blue:#2d7ff9;
-    --red:#d71f1f;
-    --green:#1f9d55;
-  }
-
-  *{box-sizing:border-box}
-
-  body{
-    margin:0;
-    font-family:Arial, Helvetica, sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding:16px;
-  }
-
-  h1{
-    text-align:center;
-    margin:0 0 6px 0;
-    font-size:30px;
-  }
-
-  .subhead{
-    text-align:center;
-    color:var(--muted);
-    margin-bottom:16px;
-    font-size:14px;
-  }
-
-  .tabs{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:16px;
-  }
-
-  .tab-btn{
-    background:var(--panel2);
-    color:var(--text);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:10px 16px;
-    cursor:pointer;
-    font-size:14px;
-  }
-
-  .tab-btn.active{
-    background:var(--blue);
-    border-color:var(--blue);
-  }
-
-  .hidden{display:none !important;}
-
-  .panel{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:16px;
-  }
-
-  .alert-list{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-  }
-
-  .alert-item{
-    background:#2a1616;
-    border:1px solid #5a2a2a;
-    color:#ffb0b0;
-    border-radius:10px;
-    padding:10px 12px;
-    font-size:14px;
-  }
-
-  .home-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:14px;
-  }
-
-  .home-card{
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:16px;
-    cursor:pointer;
-    min-height:120px;
-  }
-
-  .home-card:hover{
-    border-color:#4a4a4a;
-  }
-
-  .home-title{
-    font-size:20px;
-    font-weight:bold;
-    margin-bottom:6px;
-  }
-
-  .home-sub{
-    color:var(--muted);
-    font-size:13px;
-    line-height:1.45;
-  }
-
-  .card-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-    margin-bottom:14px;
-  }
-
-  .back-btn, .save-btn, .reset-btn{
-    border:none;
-    border-radius:10px;
-    padding:10px 14px;
-    cursor:pointer;
-    font-size:14px;
-  }
-
-  .back-btn{
-    background:#444;
-    color:white;
-  }
-
-  .save-btn{
-    background:var(--blue);
-    color:white;
-  }
-
-  .reset-btn{
-    background:#555;
-    color:white;
-  }
-
-  .post-title{
-    font-size:28px;
-    font-weight:bold;
-    margin:0;
-  }
-
-  .post-subtitle{
-    margin-top:6px;
-    color:var(--muted);
-    font-size:14px;
-  }
-
-  .post-note{
-    margin-top:10px;
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:10px 12px;
-    color:#ddd;
-    line-height:1.5;
-    font-size:14px;
-  }
-
-  table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:14px;
-    border:1px solid var(--line);
-    border-radius:12px;
-    overflow:hidden;
-  }
-
-  th, td{
-    border-bottom:1px solid var(--line);
-    padding:10px;
-    text-align:left;
-    vertical-align:top;
-  }
-
-  th{
-    background:var(--panel2);
-    font-size:14px;
-  }
-
-  tr:last-child td{
-    border-bottom:none;
-  }
-
-  input[type="text"], textarea{
-    width:100%;
-    border:none;
-    border-radius:8px;
-    background:#f2f2f2;
-    color:#111;
-    padding:10px;
-    font-size:14px;
-  }
-
-  textarea{
-    min-height:120px;
-    resize:vertical;
-  }
-
-  .section-title{
-    font-size:18px;
-    font-weight:bold;
-    margin:18px 0 8px 0;
-  }
-
-  .count-box{
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:12px;
-    margin-top:16px;
-  }
-
-  .saved-note{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:10px;
-  }
-
-  .map-layout{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:16px;
-  }
-
-  .map-wrap{
-    position:relative;
-    width:100%;
-    background:#111;
-    border:1px solid var(--line);
-    border-radius:12px;
-    overflow:hidden;
-  }
-
-  .map-wrap img{
-    width:100%;
-    display:block;
-    pointer-events:none;
-  }
-
-  .dot{
-    position:absolute;
-    width:10px;
-    height:10px;
-    background:var(--red);
-    border-radius:50%;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 0 1.5px white;
-    cursor:pointer;
-  }
-
-  .dot.active{
-    transform:translate(-50%,-50%) scale(1.35);
-    background:#ff4b4b;
-  }
-
-  .mc-grid{
-    display:grid;
-    grid-template-columns:1.1fr 0.9fr;
-    gap:16px;
-  }
-
-  .mini-list{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-  }
-
-  .mini-row{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    padding:10px 12px;
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:10px;
-    cursor:pointer;
-  }
-
-  .mini-row .left{
-    font-weight:bold;
-  }
-
-  .mini-row .right{
-    color:#ddd;
-    text-align:right;
-  }
-
-  .address-box{
-    background:var(--panel2);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:12px;
-    line-height:1.5;
-    color:#ddd;
-  }
-
-  @media (max-width: 980px){
-    .mc-grid{
-      grid-template-columns:1fr;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mililani Attendant Captain</title>
+  <style>
+    :root{
+      --bg:#0b0b0b;
+      --panel:#171717;
+      --panel2:#202020;
+      --line:#2f2f2f;
+      --text:#f5f5f5;
+      --muted:#b8b8b8;
+      --blue:#2d7ff9;
+      --red:#d71f1f;
     }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:16px;
+    }
+    h1{
+      text-align:center;
+      margin:0 0 6px 0;
+      font-size:30px;
+    }
+    .subhead{
+      text-align:center;
+      color:var(--muted);
+      margin-bottom:16px;
+      font-size:14px;
+    }
+    .tabs{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .tab-btn{
+      background:var(--panel2);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 16px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .tab-btn.active{
+      background:var(--blue);
+      border-color:var(--blue);
+    }
+    .hidden{display:none !important;}
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:16px;
+    }
+    .section-title{
+      font-size:18px;
+      font-weight:bold;
+      margin:0 0 10px 0;
+    }
+    .alert-item{
+      background:#2a1616;
+      border:1px solid #5a2a2a;
+      color:#ffb0b0;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:14px;
+      margin-bottom:8px;
+    }
+    .home-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:14px;
+    }
+    .home-card{
+      background:var(--panel2);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px;
+      cursor:pointer;
+      min-height:100px;
+    }
+    .home-title{
+      font-size:20px;
+      font-weight:bold;
+      margin-bottom:6px;
+    }
+    .home-sub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .card-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    .back-btn, .save-btn, .reset-btn{
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:14px;
+    }
+    .back-btn{background:#444;color:white;}
+    .save-btn{background:var(--blue);color:white;}
+    .reset-btn{background:#555;color:white;}
     .post-title{
-      font-size:24px;
+      font-size:26px;
+      font-weight:bold;
+      margin:0;
     }
-  }
-
-  @media (max-width: 640px){
+    .post-subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .post-note{
+      margin-top:10px;
+      background:var(--panel2);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 12px;
+      color:#ddd;
+      line-height:1.5;
+      font-size:14px;
+    }
     table{
-      display:block;
-      overflow-x:auto;
+      width:100%;
+      border-collapse:collapse;
+      margin-top:14px;
+      border:1px solid var(--line);
     }
-  }
-</style>
+    th, td{
+      border-bottom:1px solid var(--line);
+      padding:10px;
+      text-align:left;
+      vertical-align:top;
+    }
+    th{
+      background:var(--panel2);
+      font-size:14px;
+    }
+    tr:last-child td{border-bottom:none;}
+    input[type="text"], textarea{
+      width:100%;
+      border:none;
+      border-radius:8px;
+      background:#f2f2f2;
+      color:#111;
+      padding:10px;
+      font-size:14px;
+    }
+    textarea{
+      min-height:120px;
+      resize:vertical;
+    }
+    .count-box{
+      background:var(--panel2);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      margin-top:16px;
+    }
+    .saved-note{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:10px;
+    }
+    .map-wrap{
+      position:relative;
+      width:100%;
+      background:#111;
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      margin-bottom:16px;
+    }
+    .map-wrap img{
+      width:100%;
+      display:block;
+      pointer-events:none;
+    }
+    .dot{
+      position:absolute;
+      width:10px;
+      height:10px;
+      background:var(--red);
+      border-radius:50%;
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 0 1.5px white;
+      cursor:pointer;
+    }
+    .dot.active{
+      transform:translate(-50%,-50%) scale(1.35);
+      background:#ff4b4b;
+    }
+    .mini-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .mini-row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      background:var(--panel2);
+      border:1px solid var(--line);
+      border-radius:10px;
+      cursor:pointer;
+    }
+    .mini-left{font-weight:bold;}
+    .mini-right{color:#ddd;text-align:right;}
+    @media (max-width: 640px){
+      table{display:block;overflow-x:auto;}
+    }
+  </style>
 </head>
 <body>
 
-<h1>Mililani Attendant Captain</h1>
-<div class="subhead">239 Palii Street, Mililani, HI 96789</div>
+  <h1>Mililani Attendant Captain</h1>
+  <div class="subhead">239 Palii Street, Mililani, HI 96789</div>
 
-<div class="tabs">
-  <button class="tab-btn active" id="tabCardsBtn" onclick="showMainTab('cards')">Cards</button>
-  <button class="tab-btn" id="tabMapBtn" onclick="showMainTab('map')">Map</button>
-  <button class="tab-btn" id="tabMissionBtn" onclick="showMainTab('mission')">Mission Control</button>
-</div>
-
-<div class="panel">
-  <div class="section-title" style="margin-top:0;">Captain Alerts</div>
-  <div class="alert-list" id="alertList"></div>
-</div>
-
-<!-- CARDS HOME -->
-<div id="cardsHome">
-  <div class="home-grid" id="homeGrid"></div>
-</div>
-
-<!-- SINGLE CARD VIEW -->
-<div id="cardView" class="hidden">
-  <div class="panel">
-    <div class="card-top">
-      <div style="flex:1;">
-        <div class="post-title" id="cardTitle"></div>
-        <div class="post-subtitle" id="cardSubtitle"></div>
-        <div class="post-note" id="cardHeaderNote"></div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="back-btn" onclick="closeCard()">Back</button>
-        <button class="save-btn" onclick="saveCurrentPost()">Save</button>
-        <button class="reset-btn" onclick="resetCurrentPost()">Reset</button>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th style="width:28%;">Shift Time</th>
-          <th style="width:36%;">Assigned</th>
-          <th style="width:36%;">Notes</th>
-        </tr>
-      </thead>
-      <tbody id="shiftTableBody"></tbody>
-    </table>
-
-    <div id="countSection" class="count-box hidden">
-      <div class="section-title" style="margin-top:0;">Balcony Attendance Count Times</div>
-      <div style="margin-bottom:10px; color:#ddd;">
-        Count #1 — 11:30 AM<br>
-        Count #2 — 1:50 PM<br>
-        Send totals to Captain
-      </div>
-
-      <label>11:30 AM Count</label>
-      <input type="text" id="count1Input">
-
-      <label>1:50 PM Count</label>
-      <input type="text" id="count2Input">
-    </div>
-
-    <div class="section-title">Captain Notes</div>
-    <textarea id="captainNotesInput" placeholder="Write captain notes here..."></textarea>
-
-    <div class="saved-note">Changes save on this device after you tap Save.</div>
+  <div class="tabs">
+    <button class="tab-btn active" id="cardsTabBtn" type="button">Cards</button>
+    <button class="tab-btn" id="mapTabBtn" type="button">Map</button>
+    <button class="tab-btn" id="missionTabBtn" type="button">Mission Control</button>
   </div>
-</div>
 
-<!-- MAP VIEW -->
-<div id="mapView" class="hidden">
-  <div class="map-layout">
+  <div class="panel">
+    <div class="section-title">Captain Alerts</div>
+    <div id="alertList"></div>
+  </div>
+
+  <div id="cardsHome">
+    <div class="home-grid" id="homeGrid"></div>
+  </div>
+
+  <div id="cardView" class="hidden">
     <div class="panel">
-      <div class="section-title" style="margin-top:0;">Ground Level</div>
+      <div class="card-top">
+        <div style="flex:1;">
+          <div class="post-title" id="cardTitle"></div>
+          <div class="post-subtitle" id="cardSubtitle"></div>
+          <div class="post-note" id="cardHeaderNote"></div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="back-btn" id="backBtn" type="button">Back</button>
+          <button class="save-btn" id="saveBtn" type="button">Save</button>
+          <button class="reset-btn" id="resetBtn" type="button">Reset</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28%;">Shift Time</th>
+            <th style="width:36%;">Assigned</th>
+            <th style="width:36%;">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="shiftTableBody"></tbody>
+      </table>
+
+      <div id="countSection" class="count-box hidden">
+        <div class="section-title">Balcony Attendance Count Times</div>
+        <div style="margin-bottom:10px; color:#ddd;">
+          Count #1 — 11:30 AM<br>
+          Count #2 — 1:50 PM<br>
+          Send totals to Captain
+        </div>
+
+        <label>11:30 AM Count</label>
+        <input type="text" id="count1Input">
+
+        <label>1:50 PM Count</label>
+        <input type="text" id="count2Input">
+      </div>
+
+      <div class="section-title" style="margin-top:16px;">Captain Notes</div>
+      <textarea id="captainNotesInput" placeholder="Write captain notes here..."></textarea>
+
+      <div class="saved-note">Changes save after you tap Save.</div>
+    </div>
+  </div>
+
+  <div id="mapView" class="hidden">
+    <div class="panel">
+      <div class="section-title">Ground Level</div>
       <div class="map-wrap">
         <img src="ground-map.png" alt="Ground Level Map">
-        <div class="dot" id="dot-1" style="left:23.6%;top:82.2%" onclick="openPostFromAnywhere(1)"></div>
-        <div class="dot" id="dot-2" style="left:49%;top:68.7%" onclick="openPostFromAnywhere(2)"></div>
-        <div class="dot" id="dot-3" style="left:33.7%;top:34%" onclick="openPostFromAnywhere(3)"></div>
-        <div class="dot" id="dot-4" style="left:64.8%;top:35.3%" onclick="openPostFromAnywhere(4)"></div>
-        <div class="dot" id="dot-5" style="left:85.2%;top:72%" onclick="openPostFromAnywhere(5)"></div>
-        <div class="dot" id="dot-6" style="left:58.8%;top:80.5%" onclick="openPostFromAnywhere(6)"></div>
-        <div class="dot" id="dot-7" style="left:58.4%;top:75.6%" onclick="openPostFromAnywhere(7)"></div>
+        <div class="dot" id="dot-1" style="left:23.6%;top:82.2%"></div>
+        <div class="dot" id="dot-2" style="left:49%;top:68.7%"></div>
+        <div class="dot" id="dot-3" style="left:33.7%;top:34%"></div>
+        <div class="dot" id="dot-4" style="left:64.8%;top:35.3%"></div>
+        <div class="dot" id="dot-5" style="left:85.2%;top:72%"></div>
+        <div class="dot" id="dot-6" style="left:58.8%;top:80.5%"></div>
+        <div class="dot" id="dot-7" style="left:58.4%;top:75.6%"></div>
       </div>
-    </div>
 
-    <div class="panel">
-      <div class="section-title" style="margin-top:0;">Balcony Level</div>
+      <div class="section-title">Balcony Level</div>
       <div class="map-wrap">
         <img src="balcony-map.png" alt="Balcony Level Map">
-        <div class="dot" id="dot-8" style="left:62.2%;top:75.2%" onclick="openPostFromAnywhere(8)"></div>
-        <div class="dot" id="dot-9" style="left:56%;top:59.3%" onclick="openPostFromAnywhere(9)"></div>
+        <div class="dot" id="dot-8" style="left:62.2%;top:75.2%"></div>
+        <div class="dot" id="dot-9" style="left:56%;top:59.3%"></div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MISSION CONTROL -->
-<div id="missionView" class="hidden">
-  <div class="panel">
-    <div class="section-title" style="margin-top:0;">Current Shift Overview</div>
-    <div id="timelineBar" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"></div>
-  </div>
-
-  <div class="mc-grid">
+  <div id="missionView" class="hidden">
     <div class="panel">
-      <div class="section-title" style="margin-top:0;">Posts on Selected Shift</div>
+      <div class="section-title">Select Shift</div>
+      <div id="timelineBar" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">Posts on Selected Shift</div>
       <div class="mini-list" id="missionPostList"></div>
     </div>
-
-    <div class="panel">
-      <div class="section-title" style="margin-top:0;">Quick Info</div>
-      <div class="address-box">
-        <strong>Assembly Hall Address</strong><br>
-        Mililani Assembly Hall<br>
-        239 Palii Street<br>
-        Mililani, HI 96789
-      </div>
-
-      <div class="count-box">
-        <div><strong>Balcony Counts</strong></div>
-        <div style="margin-top:8px;">Count #1 — 11:30 AM</div>
-        <div>Count #2 — 1:50 PM</div>
-      </div>
-    </div>
   </div>
-</div>
 
 <script>
-const STORAGE_KEY = "mililani-card-first-v1";
+(function () {
+  const STORAGE_KEY = "mililani-card-first-v2";
 
-const shiftSlots = [
-  { key:"s1", label:"7:45 AM–9:20 AM" },
-  { key:"s2", label:"9:20 AM–10:55 AM" },
-  { key:"s3", label:"10:55 AM–12:10 PM" },
-  { key:"s4", label:"12:10 PM–1:25 PM" },
-  { key:"s5", label:"1:25 PM–2:40 PM" },
-  { key:"s6", label:"2:40 PM–3:40 PM" },
-  { key:"s7", label:"3:40 PM–TBD" }
-];
+  const shiftSlots = [
+    { key: "s1", label: "7:45 AM–9:20 AM" },
+    { key: "s2", label: "9:20 AM–10:55 AM" },
+    { key: "s3", label: "10:55 AM–12:10 PM" },
+    { key: "s4", label: "12:10 PM–1:25 PM" },
+    { key: "s5", label: "1:25 PM–2:40 PM" },
+    { key: "s6", label: "2:40 PM–3:40 PM" },
+    { key: "s7", label: "3:40 PM–TBD" }
+  ];
 
-const defaultPosts = [
-  {
-    id:1,
-    title:"POST 1 — LOBBY ENTRANCE",
-    subtitle:"2 Brothers Required",
-    headerNote:"Team A: Grant Manalili, Charlie Omo • Team B: Joel Kiliona, Isaias Parrish",
-    shifts:{
-      s1:{assigned:"Team A", note:""},
-      s2:{assigned:"Team B", note:""},
-      s3:{assigned:"Team A", note:""},
-      s4:{assigned:"Team B (Lunch)", note:""},
-      s5:{assigned:"Team A", note:""},
-      s6:{assigned:"Team B", note:""},
-      s7:{assigned:"Team A", note:""}
+  const defaultPosts = [
+    {
+      id:1,
+      title:"POST 1 — LOBBY ENTRANCE",
+      subtitle:"2 Brothers Required",
+      headerNote:"Team A: Grant Manalili, Charlie Omo • Team B: Joel Kiliona, Isaias Parrish",
+      shifts:{
+        s1:{assigned:"Team A", note:""},
+        s2:{assigned:"Team B", note:""},
+        s3:{assigned:"Team A", note:""},
+        s4:{assigned:"Team B (Lunch)", note:""},
+        s5:{assigned:"Team A", note:""},
+        s6:{assigned:"Team B", note:""},
+        s7:{assigned:"Team A", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:2,
-    title:"POST 2 — AUDITORIUM ENTRANCE",
-    subtitle:"",
-    headerNote:"",
-    shifts:{
-      s1:{assigned:"Erwin Pascua", note:""},
-      s2:{assigned:"Mark Foster", note:""},
-      s3:{assigned:"Erwin Pascua", note:""},
-      s4:{assigned:"Mark Foster (Lunch)", note:""},
-      s5:{assigned:"Erwin Pascua", note:""},
-      s6:{assigned:"Mark Foster", note:""},
-      s7:{assigned:"Erwin Pascua", note:""}
+    {
+      id:2,
+      title:"POST 2 — AUDITORIUM ENTRANCE",
+      subtitle:"",
+      headerNote:"",
+      shifts:{
+        s1:{assigned:"Erwin Pascua", note:""},
+        s2:{assigned:"Mark Foster", note:""},
+        s3:{assigned:"Erwin Pascua", note:""},
+        s4:{assigned:"Mark Foster (Lunch)", note:""},
+        s5:{assigned:"Erwin Pascua", note:""},
+        s6:{assigned:"Mark Foster", note:""},
+        s7:{assigned:"Erwin Pascua", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:3,
-    title:"POST 3 — LEFT AUDITORIUM",
-    subtitle:"",
-    headerNote:"",
-    shifts:{
-      s1:{assigned:"Kawika Delacruz", note:""},
-      s2:{assigned:"Norman Ho‘omanawanui", note:""},
-      s3:{assigned:"Kawika Delacruz", note:""},
-      s4:{assigned:"Norman Ho‘omanawanui (Lunch)", note:""},
-      s5:{assigned:"Kawika Delacruz", note:""},
-      s6:{assigned:"Norman Ho‘omanawanui", note:""},
-      s7:{assigned:"Kawika Delacruz", note:""}
+    {
+      id:3,
+      title:"POST 3 — LEFT AUDITORIUM",
+      subtitle:"",
+      headerNote:"",
+      shifts:{
+        s1:{assigned:"Kawika Delacruz", note:""},
+        s2:{assigned:"Norman Ho‘omanawanui", note:""},
+        s3:{assigned:"Kawika Delacruz", note:""},
+        s4:{assigned:"Norman Ho‘omanawanui (Lunch)", note:""},
+        s5:{assigned:"Kawika Delacruz", note:""},
+        s6:{assigned:"Norman Ho‘omanawanui", note:""},
+        s7:{assigned:"Kawika Delacruz", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:4,
-    title:"POST 4 — RIGHT AUDITORIUM",
-    subtitle:"",
-    headerNote:"",
-    shifts:{
-      s1:{assigned:"Hiland Itelmong", note:""},
-      s2:{assigned:"Jourdan Manta", note:""},
-      s3:{assigned:"Hiland Itelmong", note:""},
-      s4:{assigned:"Jourdan Manta (Lunch)", note:""},
-      s5:{assigned:"Hiland Itelmong", note:""},
-      s6:{assigned:"Jourdan Manta", note:""},
-      s7:{assigned:"Hiland Itelmong", note:""}
+    {
+      id:4,
+      title:"POST 4 — RIGHT AUDITORIUM",
+      subtitle:"",
+      headerNote:"",
+      shifts:{
+        s1:{assigned:"Hiland Itelmong", note:""},
+        s2:{assigned:"Jourdan Manta", note:""},
+        s3:{assigned:"Hiland Itelmong", note:""},
+        s4:{assigned:"Jourdan Manta (Lunch)", note:""},
+        s5:{assigned:"Hiland Itelmong", note:""},
+        s6:{assigned:"Jourdan Manta", note:""},
+        s7:{assigned:"Hiland Itelmong", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:5,
-    title:"POST 5 — KH A HALLWAY",
-    subtitle:"",
-    headerNote:"",
-    shifts:{
-      s1:{assigned:"Logan Griffin", note:""},
-      s2:{assigned:"Rodney Bristol", note:""},
-      s3:{assigned:"Logan Griffin", note:""},
-      s4:{assigned:"Rodney Bristol (Lunch)", note:""},
-      s5:{assigned:"Logan Griffin", note:""},
-      s6:{assigned:"Rodney Bristol", note:""},
-      s7:{assigned:"Logan Griffin", note:""}
+    {
+      id:5,
+      title:"POST 5 — KH A HALLWAY",
+      subtitle:"",
+      headerNote:"",
+      shifts:{
+        s1:{assigned:"Logan Griffin", note:""},
+        s2:{assigned:"Rodney Bristol", note:""},
+        s3:{assigned:"Logan Griffin", note:""},
+        s4:{assigned:"Rodney Bristol (Lunch)", note:""},
+        s5:{assigned:"Logan Griffin", note:""},
+        s6:{assigned:"Rodney Bristol", note:""},
+        s7:{assigned:"Logan Griffin", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:6,
-    title:"POST 6 — BASEMENT STAIRS",
-    subtitle:"2 Brothers Required",
-    headerNote:"Evacuation Note: In the event of an evacuation, no one should evacuate toward the basement.",
-    shifts:{
-      s1:{assigned:"Al Tiu &", note:""},
-      s2:{assigned:"Kepa Apolo & Zechariah Tubon", note:""},
-      s3:{assigned:"Al Tiu &", note:""},
-      s4:{assigned:"Kepa Apolo & Zechariah Tubon (Lunch)", note:""},
-      s5:{assigned:"Al Tiu &", note:""},
-      s6:{assigned:"Kepa Apolo & Zechariah Tubon", note:""},
-      s7:{assigned:"Al Tiu &", note:""}
+    {
+      id:6,
+      title:"POST 6 — BASEMENT STAIRS",
+      subtitle:"2 Brothers Required",
+      headerNote:"Evacuation Note: In the event of an evacuation, no one should evacuate toward the basement.",
+      shifts:{
+        s1:{assigned:"Al Tiu &", note:""},
+        s2:{assigned:"Kepa Apolo & Zechariah Tubon", note:""},
+        s3:{assigned:"Al Tiu &", note:""},
+        s4:{assigned:"Kepa Apolo & Zechariah Tubon (Lunch)", note:""},
+        s5:{assigned:"Al Tiu &", note:""},
+        s6:{assigned:"Kepa Apolo & Zechariah Tubon", note:""},
+        s7:{assigned:"Al Tiu &", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:7,
-    title:"POST 7 — TOP OF STAIRS",
-    subtitle:"",
-    headerNote:"Tentative Backup:",
-    shifts:{
-      s1:{assigned:"David Yamashita", note:""},
-      s2:{assigned:"Sean Yarbenet", note:"Tentative Backup:"},
-      s3:{assigned:"David Yamashita", note:""},
-      s4:{assigned:"Sean Yarbenet (Lunch)", note:"Tentative Backup:"},
-      s5:{assigned:"David Yamashita", note:""},
-      s6:{assigned:"Sean Yarbenet", note:"Tentative Backup:"},
-      s7:{assigned:"David Yamashita", note:""}
+    {
+      id:7,
+      title:"POST 7 — TOP OF STAIRS",
+      subtitle:"",
+      headerNote:"Tentative Backup:",
+      shifts:{
+        s1:{assigned:"David Yamashita", note:""},
+        s2:{assigned:"Sean Yarbenet", note:"Tentative Backup:"},
+        s3:{assigned:"David Yamashita", note:""},
+        s4:{assigned:"Sean Yarbenet (Lunch)", note:"Tentative Backup:"},
+        s5:{assigned:"David Yamashita", note:""},
+        s6:{assigned:"Sean Yarbenet", note:"Tentative Backup:"},
+        s7:{assigned:"David Yamashita", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:8,
-    title:"POST 8 — ELEVATOR AREA (Balcony Level)",
-    subtitle:"Balcony Level",
-    headerNote:"",
-    shifts:{
-      s1:{assigned:"Jordan Moananu", note:""},
-      s2:{assigned:"Dennis Maeda", note:""},
-      s3:{assigned:"Jordan Moananu", note:""},
-      s4:{assigned:"Dennis Maeda (Lunch)", note:""},
-      s5:{assigned:"Jordan Moananu", note:""},
-      s6:{assigned:"Dennis Maeda", note:""},
-      s7:{assigned:"Jordan Moananu", note:""}
+    {
+      id:8,
+      title:"POST 8 — ELEVATOR AREA (Balcony Level)",
+      subtitle:"Balcony Level",
+      headerNote:"",
+      shifts:{
+        s1:{assigned:"Jordan Moananu", note:""},
+        s2:{assigned:"Dennis Maeda", note:""},
+        s3:{assigned:"Jordan Moananu", note:""},
+        s4:{assigned:"Dennis Maeda (Lunch)", note:""},
+        s5:{assigned:"Jordan Moananu", note:""},
+        s6:{assigned:"Dennis Maeda", note:""},
+        s7:{assigned:"Jordan Moananu", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  },
-  {
-    id:9,
-    title:"POST 9 — BALCONY",
-    subtitle:"Attendance Counts",
-    headerNote:"Count #1 — 11:30 AM • Count #2 — 1:50 PM",
-    shifts:{
-      s1:{assigned:"Nainoa Driver", note:""},
-      s2:{assigned:"Joey Cariaga", note:""},
-      s3:{assigned:"Nainoa Driver", note:""},
-      s4:{assigned:"Joey Cariaga (Lunch)", note:""},
-      s5:{assigned:"Nainoa Driver", note:""},
-      s6:{assigned:"Joey Cariaga", note:""},
-      s7:{assigned:"Nainoa Driver", note:""}
-    },
-    captainNotes:"",
-    count1:"",
-    count2:""
-  }
-];
-
-let posts = loadPosts();
-let currentTab = "cards";
-let currentPostId = null;
-let currentShiftKey = "s1";
-
-function loadPosts(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved){
-    try { return JSON.parse(saved); } catch(e){}
-  }
-  return JSON.parse(JSON.stringify(defaultPosts));
-}
-
-function savePosts(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-}
-
-function getPost(id){
-  return posts.find(p => p.id === id);
-}
-
-function showMainTab(tab){
-  currentTab = tab;
-
-  document.getElementById("tabCardsBtn").classList.toggle("active", tab === "cards");
-  document.getElementById("tabMapBtn").classList.toggle("active", tab === "map");
-  document.getElementById("tabMissionBtn").classList.toggle("active", tab === "mission");
-
-  document.getElementById("cardsHome").classList.toggle("hidden", !(tab === "cards" && currentPostId === null));
-  document.getElementById("cardView").classList.toggle("hidden", !(tab === "cards" && currentPostId !== null));
-  document.getElementById("mapView").classList.toggle("hidden", tab !== "map");
-  document.getElementById("missionView").classList.toggle("hidden", tab !== "mission");
-}
-
-function buildAlerts(){
-  const alerts = [];
-
-  const post6 = getPost(6);
-  ["s1","s3","s5","s7"].forEach(k=>{
-    if((post6.shifts[k].assigned || "").includes("&") && post6.shifts[k].assigned.trim().endsWith("&")){
-      alerts.push("⚠ Post 6 needs second brother");
+    {
+      id:9,
+      title:"POST 9 — BALCONY",
+      subtitle:"Attendance Counts",
+      headerNote:"Count #1 — 11:30 AM • Count #2 — 1:50 PM",
+      shifts:{
+        s1:{assigned:"Nainoa Driver", note:""},
+        s2:{assigned:"Joey Cariaga", note:""},
+        s3:{assigned:"Nainoa Driver", note:""},
+        s4:{assigned:"Joey Cariaga (Lunch)", note:""},
+        s5:{assigned:"Nainoa Driver", note:""},
+        s6:{assigned:"Joey Cariaga", note:""},
+        s7:{assigned:"Nainoa Driver", note:""}
+      },
+      captainNotes:"",
+      count1:"",
+      count2:""
     }
-  });
+  ];
 
-  const post7 = getPost(7);
-  if(["s2","s4","s6"].some(k => (post7.shifts[k].note || "").toLowerCase().includes("tentative"))){
-    alerts.push("⚠ Post 7 tentative backup");
+  let posts = loadPosts();
+  let currentTab = "cards";
+  let currentPostId = null;
+  let currentShiftKey = "s1";
+
+  function deepCopy(obj){
+    return JSON.parse(JSON.stringify(obj));
   }
 
-  alerts.push("⏱ Balcony count due at 11:30 AM");
-  alerts.push("⏱ Balcony count due at 1:50 PM");
-
-  const unique = [...new Set(alerts)];
-  const el = document.getElementById("alertList");
-  el.innerHTML = unique.map(a => `<div class="alert-item">${a}</div>`).join("");
-}
-
-function buildHome(){
-  const homeGrid = document.getElementById("homeGrid");
-  homeGrid.innerHTML = posts.map(post => `
-    <div class="home-card" onclick="openCard(${post.id})">
-      <div class="home-title">Post ${post.id}</div>
-      <div class="home-sub">${post.title.replace(/^POST \\d+ — /,'')}</div>
-      ${post.subtitle ? `<div class="home-sub" style="margin-top:8px;">${post.subtitle}</div>` : ""}
-    </div>
-  `).join("");
-}
-
-function openCard(id){
-  currentPostId = id;
-  currentTab = "cards";
-  renderCard();
-  showMainTab("cards");
-  highlightDots();
-}
-
-function closeCard(){
-  currentPostId = null;
-  showMainTab("cards");
-}
-
-function renderCard(){
-  const post = getPost(currentPostId);
-  if(!post) return;
-
-  document.getElementById("cardTitle").textContent = post.title;
-  document.getElementById("cardSubtitle").textContent = post.subtitle || "";
-  document.getElementById("cardHeaderNote").textContent = post.headerNote || "";
-
-  const tbody = document.getElementById("shiftTableBody");
-  tbody.innerHTML = shiftSlots.map(slot => `
-    <tr>
-      <td>${slot.label}</td>
-      <td><input type="text" value="${escapeHtml(post.shifts[slot.key].assigned || '')}" onchange="updateShiftField(${post.id}, '${slot.key}', 'assigned', this.value)"></td>
-      <td><input type="text" value="${escapeHtml(post.shifts[slot.key].note || '')}" onchange="updateShiftField(${post.id}, '${slot.key}', 'note', this.value)"></td>
-    </tr>
-  `).join("");
-
-  document.getElementById("captainNotesInput").value = post.captainNotes || "";
-
-  const countSection = document.getElementById("countSection");
-  if(post.id === 9){
-    countSection.classList.remove("hidden");
-    document.getElementById("count1Input").value = post.count1 || "";
-    document.getElementById("count2Input").value = post.count2 || "";
-  } else {
-    countSection.classList.add("hidden");
-  }
-}
-
-function updateShiftField(postId, shiftKey, field, value){
-  const post = getPost(postId);
-  post.shifts[shiftKey][field] = value;
-}
-
-function saveCurrentPost(){
-  const post = getPost(currentPostId);
-  post.captainNotes = document.getElementById("captainNotesInput").value;
-
-  if(post.id === 9){
-    post.count1 = document.getElementById("count1Input").value;
-    post.count2 = document.getElementById("count2Input").value;
+  function loadPosts(){
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      try { return JSON.parse(saved); } catch(e){}
+    }
+    return deepCopy(defaultPosts);
   }
 
-  savePosts();
-  buildAlerts();
-  buildMission();
-  alert("Saved");
-}
+  function savePosts(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  }
 
-function resetCurrentPost(){
-  if(!confirm("Reset this post back to default?")) return;
-  const idx = posts.findIndex(p => p.id === currentPostId);
-  posts[idx] = JSON.parse(JSON.stringify(defaultPosts.find(p => p.id === currentPostId)));
-  savePosts();
-  renderCard();
-  buildAlerts();
-  buildMission();
-}
+  function getPost(id){
+    return posts.find(function(p){ return p.id === id; });
+  }
 
-function openPostFromAnywhere(id){
-  openCard(id);
-}
+  function setActiveTabButton(tab){
+    document.getElementById("cardsTabBtn").classList.toggle("active", tab === "cards");
+    document.getElementById("mapTabBtn").classList.toggle("active", tab === "map");
+    document.getElementById("missionTabBtn").classList.toggle("active", tab === "mission");
+  }
 
-function highlightDots(){
-  for(let i=1;i<=9;i++){
-    const dot = document.getElementById("dot-" + i);
-    if(dot){
-      dot.classList.toggle("active"
+  function showMainTab(tab){
+    currentTab = tab;
+    setActiveTabButton(tab);
+
+    document.getElementById("cardsHome").classList.toggle("hidden", !(tab === "cards" && currentPostId === null));
+    document.getElementById("cardView").classList.toggle("hidden", !(tab === "cards" && currentPostId !== null));
+    document.getElementById("mapView").classList.toggle("hidden", tab !== "map");
+    document.getElementById("missionView").classList.toggle("hidden", tab !== "mission");
+  }
+
+  function buildAlerts(){
+    const alerts = [];
+    const post6 = getPost(6);
+    ["s1","s3","s5","s7"].forEach(function(k){
+      const value = (post6.shifts[k].assigned || "").trim();
+      if(value.endsWith("&")){
+        alerts.push("⚠ Post 6 needs second brother");
+      }
+    });
+
+    const post7 = getPost(7);
+    ["s2","s4","s6"].forEach(function(k){
+      const note = (post7.shifts[k].note || "").toLowerCase();
+      if(note.indexOf("tentative") !== -1){
+        alerts.push("⚠ Post 7 tentative backup");
+      }
+    });
+
+    alerts.push("⏱ Balcony count due at 11:30 AM");
+    alerts.push("⏱ Balcony count due at 1:50 PM");
+
+    const unique = Array.from(new Set(alerts));
+    const html = unique.map(function(a){
+      return '<div class="alert-item">' + escapeHtml(a) + '</div>';
+    }).join("");
+
+    document.getElementById("alertList").innerHTML = html;
+  }
+
+  function buildHome(){
+    const html = posts.map(function(post){
+      let extra = post.subtitle ? '<div class="home-sub" style="margin-top:8px;">' + escapeHtml(post.subtitle) + '</div>' : '';
+      return ''
+        + '<div class="home-card" data-post="' + post.id + '">'
+        +   '<div class="home-title">Post ' + post.id + '</div>'
+        +   '<div class="home-sub">' + escapeHtml(post.title.replace(/^POST \\d+ — /,'')) + '</div>'
+        +   extra
+        + '</div>';
+    }).join("");
+    document.getElementById("homeGrid").innerHTML = html;
+
+    const cards = document.querySelectorAll(".home-card");
+    cards.forEach(function(card){
+      card.addEventListener("click", function(){
+        openCard(parseInt(card.getAttribute("data-post"), 10));
+      });
+    });
+  }
+
+  function renderCard(){
+    const post = getPost(currentPostId);
+    if(!post) return;
+
+    document.getElementById("cardTitle").textContent = post.title;
+    document.getElementById("cardSubtitle").textContent = post.subtitle || "";
+    document.getElementById("cardHeaderNote").textContent = post.headerNote || "";
+
+    const tbody = document.getElementById("shiftTableBody");
+    tbody.innerHTML = "";
+
+    shiftSlots.forEach(function(slot){
+      const tr = document.createElement("tr");
+
+      const td1 = document.createElement("td");
+      td1.textContent = slot.label;
+
+      const td2 = document.createElement("td");
+      const inputAssigned = document.createElement("input");
+      inputAssigned.type = "text";
+      inputAssigned.value = post.shifts[slot.key].assigned || "";
+      inputAssigned.addEventListener("change", function(){
+        post.shifts[slot.key].assigned = inputAssigned.value;
+      });
+      td2.appendChild(inputAssigned);
+
+      const td3 = document.createElement("td");
+      const inputNote = document.createElement("input");
+      inputNote.type = "text";
+      inputNote.value = post.shifts[slot.key].note || "";
+      inputNote.addEventListener("change", function(){
+        post.shifts[slot.key].note = inputNote.value;
+      });
+      td3.appendChild(inputNote);
+
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("captainNotesInput").value = post.captainNotes || "";
+
+    const countSection = document.getElementById("countSection");
+    if(post.id === 9){
+      countSection.classList.remove("hidden");
+      document.getElementById("count1Input").value = post.count1 || "";
+      document.getElementById("count2Input").value = post.count2 || "";
+    } else {
+      countSection.classList.add("hidden");
+    }
+  }
+
+  function openCard(id){
+    currentPostId = id;
+    renderCard();
+    showMainTab("cards");
+    highlightDots();
+  }
+
+  function closeCard(){
+    currentPostId = null;
+    showMainTab("cards");
+    highlightDots();
+  }
+
+  function saveCurrentPost(){
+    const post = getPost(currentPostId);
+    if(!post) return;
+    post.captainNotes = document.getElementById("captainNotesInput").value;
+
+    if(post.id === 9){
+      post.count1 = document.getElementById("count1Input").value;
+      post.count2 = document.getElementById("count2Input").value;
+    }
+
+    savePosts();
+    buildAlerts();
+    buildMission();
+    alert("Saved");
+  }
+
+  function resetCurrentPost(){
+    if(!currentPostId) return;
+    if(!confirm("Reset this post back to default?")) return;
+
+    const idx = posts.findIndex(function(p){ return p.id === currentPostId; });
+    const original = defaultPosts.find(funct

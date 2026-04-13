@@ -55,9 +55,51 @@
       padding:20px;
     }
 
-    .top-bar{
+    .utility-bar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .utility-btn{
+      background:var(--blue);
+      padding:12px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:15px;
       display:flex;
       align-items:center;
+      justify-content:center;
+      min-width:140px;
+      box-shadow:0 4px 10px rgba(0,0,0,.35);
+      transition:background .2s;
+      user-select:none;
+    }
+
+    .utility-btn:hover{
+      background:var(--blue-hover);
+    }
+
+    .utility-btn.secondary{
+      background:var(--button);
+    }
+
+    .utility-btn.secondary:hover{
+      background:var(--button-hover);
+    }
+
+    .owner-status{
+      color:var(--muted);
+      font-size:13px;
+      align-self:center;
+      padding-left:4px;
+    }
+
+    .top-bar{
+      display:flex;
+      align-items:flex-start;
       gap:14px;
       margin-bottom:18px;
       flex-wrap:wrap;
@@ -350,6 +392,11 @@
       background:var(--button-hover);
     }
 
+    .save.disabled{
+      opacity:.7;
+      cursor:default;
+    }
+
     @media (max-width:700px){
       .post-grid{
         grid-template-columns:repeat(2,1fr);
@@ -363,6 +410,67 @@
       .back-top{
         min-width:100%;
       }
+
+      .utility-btn{
+        min-width:unset;
+        flex:1 1 calc(50% - 10px);
+      }
+
+      .owner-status{
+        width:100%;
+      }
+    }
+
+    @media print{
+      body{
+        background:#fff !important;
+        color:#000 !important;
+      }
+
+      .utility-bar,
+      .top-bar,
+      #topBack{
+        display:none !important;
+      }
+
+      .container{
+        max-width:100%;
+        padding:0;
+      }
+
+      .card,
+      .section-box,
+      .notes,
+      .count-box{
+        background:#fff !important;
+        color:#000 !important;
+        border:1px solid #bbb !important;
+      }
+
+      .schedule-head{
+        background:#eee !important;
+        color:#000 !important;
+      }
+
+      .shift-row:nth-child(odd),
+      .shift-row:nth-child(even){
+        background:#fff !important;
+        color:#000 !important;
+      }
+
+      .time-cell,
+      .label,
+      .card h2,
+      strong{
+        color:#000 !important;
+      }
+
+      textarea,
+      input{
+        background:#fff !important;
+        color:#000 !important;
+        border:1px solid #bbb !important;
+      }
     }
   </style>
 </head>
@@ -373,6 +481,13 @@
   </header>
 
   <div class="container">
+    <div class="utility-bar">
+      <div class="utility-btn" id="ownerAction" onclick="loginOwner()">Owner Login</div>
+      <div class="utility-btn secondary" onclick="shareBoard()">Share Link</div>
+      <div class="utility-btn secondary" onclick="printBoard()">Print</div>
+      <div class="owner-status" id="ownerStatus">View-only mode</div>
+    </div>
+
     <div class="top-bar">
       <div class="back-top" onclick="goBack()" id="topBack" style="display:none;">
         ← Back to Posts
@@ -387,8 +502,8 @@
           <textarea id="alertEditor" class="alert-editor"></textarea>
           <div class="alert-help">One alert per line. Edit anything you like, then save.</div>
           <div class="alert-actions">
-            <div class="alert-btn primary" onclick="saveAlerts()">Save Alerts</div>
-            <div class="alert-btn" onclick="resetAlerts()">Reset Default Alerts</div>
+            <div class="alert-btn primary" id="saveAlertsBtn" onclick="saveAlerts()">Save Alerts</div>
+            <div class="alert-btn" id="resetAlertsBtn" onclick="resetAlerts()">Reset Default Alerts</div>
           </div>
         </div>
       </div>
@@ -398,10 +513,49 @@
     <div id="postCard" style="display:none;"></div>
   </div>
 
-  <script>
-    const STORAGE_KEY = "mililani-attendant-captain-clean-v1";
-    const ALERTS_KEY = "mililani-attendant-alerts-open-clean";
-    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-clean";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      getRedirectResult,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDM3hsCFZ7_-PnJqCXgwG7ItawivcVfypc",
+      authDomain: "mililani-attendant-app.firebaseapp.com",
+      projectId: "mililani-attendant-app",
+      storageBucket: "mililani-attendant-app.firebasestorage.app",
+      messagingSenderId: "615437717899",
+      appId: "1:615437717899:web:199b5d400803428fd79f8e"
+    };
+
+    const OWNER_EMAIL = "kainaluleslie@gmail.com";
+    const DEFAULT_BOARD_ID = "mililani-8Xk29QaPz71";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const url = new URL(window.location.href);
+    const boardId = url.searchParams.get("board") || DEFAULT_BOARD_ID;
+    if (!url.searchParams.get("board")) {
+      url.searchParams.set("board", boardId);
+      window.history.replaceState({}, "", url.toString());
+    }
+
+    const boardRef = doc(db, "boards", boardId);
+
+    const STORAGE_KEY = `mililani-attendant-captain-${boardId}`;
+    const ALERTS_KEY = `mililani-attendant-alerts-open-${boardId}`;
+    const ALERTS_TEXT_KEY = `mililani-attendant-alerts-text-${boardId}`;
+
+    let isOwner = false;
+    let currentPost = null;
 
     const defaultAlerts = [
       "Post 6 needs second brother on Al Tiu shifts.",
@@ -422,7 +576,7 @@
       9: "balconymap(2).jpg"
     };
 
-    const posts = {
+    const defaultPosts = {
       1: {
         title: "Post 1 – Lobby Entrance",
         details: "2 Brothers Required",
@@ -554,30 +708,19 @@
       }
     };
 
-    function loadSavedData(){
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if(!saved) return;
+    const posts = JSON.parse(JSON.stringify(defaultPosts));
 
-      try{
-        const parsed = JSON.parse(saved);
-        Object.keys(parsed).forEach(function(key){
-          if(posts[key]){
-            posts[key].details = parsed[key].details !== undefined ? parsed[key].details : posts[key].details;
-            posts[key].notes = parsed[key].notes || "";
-            posts[key].schedule = parsed[key].schedule || posts[key].schedule;
-            if(posts[key].count1 !== undefined){
-              posts[key].count1 = parsed[key].count1 || "";
-              posts[key].count2 = parsed[key].count2 || "";
-            }
-          }
-        });
-      }catch(e){}
+    function resetPostsToDefaults() {
+      const fresh = JSON.parse(JSON.stringify(defaultPosts));
+      Object.keys(fresh).forEach(function(key) {
+        posts[key] = fresh[key];
+      });
     }
 
-    function saveData(){
-      const payload = {};
-      Object.keys(posts).forEach(function(key){
-        payload[key] = {
+    function serializePosts() {
+      const out = {};
+      Object.keys(posts).forEach(function(key) {
+        out[key] = {
           details: posts[key].details || "",
           notes: posts[key].notes || "",
           schedule: posts[key].schedule || [],
@@ -585,213 +728,64 @@
           count2: posts[key].count2 || ""
         };
       });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      return out;
     }
 
-    function getAlertsText(){
+    function getAlertsText() {
       return localStorage.getItem(ALERTS_TEXT_KEY) || defaultAlerts.join("\n");
     }
 
-    function saveAlerts(){
+    function buildPayload() {
+      const alertBody = document.getElementById("alertBody");
       const editor = document.getElementById("alertEditor");
-      if(!editor) return;
-      localStorage.setItem(ALERTS_TEXT_KEY, editor.value);
-      alert("Captain Alerts saved");
+
+      return {
+        alertsText: editor ? editor.value : getAlertsText(),
+        alertsOpen: alertBody ? alertBody.classList.contains("open") : false,
+        posts: serializePosts(),
+        updatedAt: Date.now()
+      };
     }
 
-    function resetAlerts(){
-      const text = defaultAlerts.join("\n");
-      localStorage.setItem(ALERTS_TEXT_KEY, text);
-      const editor = document.getElementById("alertEditor");
-      if(editor){
-        editor.value = text;
-      }
-      alert("Captain Alerts reset");
-    }
+    function applyPayload(data) {
+      resetPostsToDefaults();
 
-    function renderAlerts(){
-      const editor = document.getElementById("alertEditor");
-      if(editor){
-        editor.value = getAlertsText();
-      }
-    }
-
-    function toggleAlerts(){
-      const body = document.getElementById("alertBody");
-      const chev = document.getElementById("alertChevron");
-      body.classList.toggle("open");
-      const isOpen = body.classList.contains("open");
-      chev.textContent = isOpen ? "▴" : "▾";
-      localStorage.setItem(ALERTS_KEY, isOpen ? "open" : "closed");
-    }
-
-    function restoreAlertsState(){
-      const state = localStorage.getItem(ALERTS_KEY);
-      const body = document.getElementById("alertBody");
-      const chev = document.getElementById("alertChevron");
-
-      if(state === "open"){
-        body.classList.add("open");
-        chev.textContent = "▴";
-      }else{
-        body.classList.remove("open");
-        chev.textContent = "▾";
-      }
-    }
-
-    function renderButtons(){
-      const grid = document.getElementById("postGrid");
-      grid.innerHTML = "";
-
-      for(let i = 1; i <= 9; i++){
-        const btn = document.createElement("div");
-        btn.className = "post-btn";
-        btn.textContent = "Post " + i;
-        btn.onclick = function(){
-          openPost(i);
-        };
-        grid.appendChild(btn);
-      }
-    }
-
-    function openPost(num){
-      const post = posts[num];
-      const grid = document.getElementById("postGrid");
-      const card = document.getElementById("postCard");
-      const topBack = document.getElementById("topBack");
-
-      grid.style.display = "none";
-      card.style.display = "block";
-      topBack.style.display = "flex";
-
-      let scheduleHTML = "";
-      post.schedule.forEach(function(item, index){
-        scheduleHTML += `
-          <div class="shift-row">
-            <div class="time-cell">${escapeHtmlText(item[0])}</div>
-            <div>
-              <input
-                class="assigned-input"
-                type="text"
-                id="assigned-${index}"
-                value="${escapeHtmlAttr(item[1])}"
-              />
-            </div>
-          </div>
-        `;
-      });
-
-      let countHTML = "";
-      if(num === 9){
-        countHTML = `
-          <div class="count-box">
-            <div class="label">Balcony Count Entry</div>
-            <div>11:30 AM Count</div>
-            <input type="text" id="count1Input" value="${escapeHtmlAttr(post.count1 || "")}" />
-            <div>1:50 PM Count</div>
-            <input type="text" id="count2Input" value="${escapeHtmlAttr(post.count2 || "")}" />
-          </div>
-        `;
+      if (data && data.posts) {
+        Object.keys(data.posts).forEach(function(key) {
+          if (posts[key]) {
+            posts[key].details = data.posts[key].details !== undefined ? data.posts[key].details : posts[key].details;
+            posts[key].notes = data.posts[key].notes || "";
+            posts[key].schedule = data.posts[key].schedule || posts[key].schedule;
+            if (posts[key].count1 !== undefined) {
+              posts[key].count1 = data.posts[key].count1 || "";
+              posts[key].count2 = data.posts[key].count2 || "";
+            }
+          }
+        });
       }
 
-      const mapFile = imageMap[num];
+      const alertsText = data && typeof data.alertsText === "string"
+        ? data.alertsText
+        : defaultAlerts.join("\n");
 
-      card.innerHTML = `
-        <div class="card">
-          <h2>${escapeHtmlText(post.title)}</h2>
+      const alertsOpen = !!(data && data.alertsOpen);
 
-          <div class="section-box details-box">
-            <div class="label">Post Details</div>
-            <textarea id="detailsInput">${escapeHtmlText(post.details || "")}</textarea>
-          </div>
-
-          <div class="section-box">
-            <div class="label">Shift Times / Assigned</div>
-            <div class="schedule-wrap">
-              <div class="schedule-head">
-                <div>Shift Time</div>
-                <div>Assigned</div>
-              </div>
-              ${scheduleHTML}
-            </div>
-          </div>
-
-          <div class="map">
-            <div class="label">Post Location Reference</div>
-            <div class="map-wrap">
-              <img src="${mapFile}" alt="${escapeHtmlAttr(post.title)} map">
-            </div>
-          </div>
-
-          <div class="notes">
-            <strong>Captain Notes</strong>
-            <textarea id="notesInput">${escapeHtmlText(post.notes || "")}</textarea>
-          </div>
-
-          ${countHTML}
-
-          <div class="action-row">
-            <div class="save" onclick="savePost(${num})">Save Changes</div>
-          </div>
-        </div>
-      `;
+      localStorage.setItem(ALERTS_TEXT_KEY, alertsText);
+      localStorage.setItem(ALERTS_KEY, alertsOpen ? "open" : "closed");
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serializePosts()));
     }
 
-    function savePost(num){
-      const post = posts[num];
+    function loadSavedData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
 
-      const detailsInput = document.getElementById("detailsInput");
-      const notesInput = document.getElementById("notesInput");
-
-      if(detailsInput){
-        post.details = detailsInput.value;
-      }
-
-      if(notesInput){
-        post.notes = notesInput.value;
-      }
-
-      post.schedule = post.schedule.map(function(item, index){
-        const assignedInput = document.getElementById("assigned-" + index);
-        return [item[0], assignedInput ? assignedInput.value : item[1]];
-      });
-
-      if(num === 9){
-        const c1 = document.getElementById("count1Input");
-        const c2 = document.getElementById("count2Input");
-        post.count1 = c1 ? c1.value : "";
-        post.count2 = c2 ? c2.value : "";
-      }
-
-      saveData();
-      alert("Saved");
-    }
-
-    function goBack(){
-      document.getElementById("postCard").style.display = "none";
-      document.getElementById("postGrid").style.display = "grid";
-      document.getElementById("topBack").style.display = "none";
-    }
-
-    function escapeHtmlText(str){
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function escapeHtmlAttr(str){
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    loadSavedData();
-    renderButtons();
-    renderAlerts();
-    restoreAlertsState();
-  </script>
-</body>
-</html>
+      try {
+        const parsed = JSON.parse(saved);
+        Object.keys(parsed).forEach(function(key) {
+          if (posts[key]) {
+            posts[key].details = parsed[key].details !== undefined ? parsed[key].details : posts[key].details;
+            posts[key].notes = parsed[key].notes || "";
+            posts[key].schedule = parsed[key].schedule || posts[key].schedule;
+            if (posts[key].count1 !== undefined) {
+              posts[key].count1 = parsed[key].count1 || "";
+              posts[key].count2 = parsed[key].count2

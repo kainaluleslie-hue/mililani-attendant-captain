@@ -1102,7 +1102,16 @@
 
     onAuthStateChanged(auth, async function(user){
       currentUser = user || null;
-      isOwner = !!(user && user.email && user.email.toLowerCase() === OWNER_EMAIL);
+      const signedInEmail = user && user.email ? user.email.toLowerCase().trim() : "";
+const ownerEmail = OWNER_EMAIL.toLowerCase().trim();
+
+alert(
+  "SIGNED IN:\n" + signedInEmail +
+  "\n\nOWNER:\n" + ownerEmail +
+  "\n\nMATCH:\n" + (signedInEmail === ownerEmail)
+);
+
+isOwner = signedInEmail === ownerEmail;
       authReady = true;
       renderAll();
 

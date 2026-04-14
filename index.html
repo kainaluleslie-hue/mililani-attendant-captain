@@ -55,6 +55,48 @@
       padding:20px;
     }
 
+    .utility-bar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .utility-btn{
+      background:var(--blue);
+      padding:12px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:15px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-width:140px;
+      box-shadow:0 4px 10px rgba(0,0,0,.35);
+      transition:background .2s;
+      user-select:none;
+    }
+
+    .utility-btn:hover{
+      background:var(--blue-hover);
+    }
+
+    .utility-btn.secondary{
+      background:var(--button);
+    }
+
+    .utility-btn.secondary:hover{
+      background:var(--button-hover);
+    }
+
+    .mode-note{
+      color:var(--muted);
+      font-size:13px;
+      align-self:center;
+      padding-left:4px;
+    }
+
     .top-bar{
       display:flex;
       align-items:center;
@@ -350,6 +392,11 @@
       background:var(--button-hover);
     }
 
+    .save.disabled{
+      opacity:.7;
+      cursor:default;
+    }
+
     @media (max-width:700px){
       .post-grid{
         grid-template-columns:repeat(2,1fr);
@@ -363,6 +410,67 @@
       .back-top{
         min-width:100%;
       }
+
+      .utility-btn{
+        min-width:unset;
+        flex:1 1 calc(50% - 10px);
+      }
+
+      .mode-note{
+        width:100%;
+      }
+    }
+
+    @media print{
+      body{
+        background:#fff !important;
+        color:#000 !important;
+      }
+
+      .utility-bar,
+      .top-bar,
+      #topBack{
+        display:none !important;
+      }
+
+      .container{
+        max-width:100%;
+        padding:0;
+      }
+
+      .card,
+      .section-box,
+      .notes,
+      .count-box{
+        background:#fff !important;
+        color:#000 !important;
+        border:1px solid #bbb !important;
+      }
+
+      .schedule-head{
+        background:#eee !important;
+        color:#000 !important;
+      }
+
+      .shift-row:nth-child(odd),
+      .shift-row:nth-child(even){
+        background:#fff !important;
+        color:#000 !important;
+      }
+
+      .time-cell,
+      .label,
+      .card h2,
+      strong{
+        color:#000 !important;
+      }
+
+      textarea,
+      input{
+        background:#fff !important;
+        color:#000 !important;
+        border:1px solid #bbb !important;
+      }
     }
   </style>
 </head>
@@ -373,6 +481,12 @@
   </header>
 
   <div class="container">
+    <div class="utility-bar">
+      <div class="utility-btn secondary" onclick="shareBoard()">Share Link</div>
+      <div class="utility-btn secondary" onclick="printBoard()">Print</div>
+      <div class="mode-note" id="modeNote"></div>
+    </div>
+
     <div class="top-bar">
       <div class="back-top" onclick="goBack()" id="topBack" style="display:none;">
         ← Back to Posts
@@ -385,8 +499,8 @@
         </div>
         <div class="alert-body" id="alertBody">
           <textarea id="alertEditor" class="alert-editor"></textarea>
-          <div class="alert-help">One alert per line. Edit anything you like, then save.</div>
-          <div class="alert-actions">
+          <div class="alert-help" id="alertHelp">One alert per line.</div>
+          <div class="alert-actions" id="alertActions">
             <div class="alert-btn primary" onclick="saveAlerts()">Save Alerts</div>
             <div class="alert-btn" onclick="resetAlerts()">Reset Default Alerts</div>
           </div>
@@ -402,6 +516,7 @@
     const STORAGE_KEY = "mililani-attendant-captain-clean-v1";
     const ALERTS_KEY = "mililani-attendant-alerts-open-clean";
     const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-clean";
+    const isAdmin = window.location.search.includes("admin=true");
 
     const defaultAlerts = [
       "Post 6 needs second brother on Al Tiu shifts.",
@@ -593,6 +708,7 @@
     }
 
     function saveAlerts(){
+      if(!isAdmin) return;
       const editor = document.getElementById("alertEditor");
       if(!editor) return;
       localStorage.setItem(ALERTS_TEXT_KEY, editor.value);
@@ -600,6 +716,7 @@
     }
 
     function resetAlerts(){
+      if(!isAdmin) return;
       const text = defaultAlerts.join("\n");
       localStorage.setItem(ALERTS_TEXT_KEY, text);
       const editor = document.getElementById("alertEditor");
@@ -613,6 +730,7 @@
       const editor = document.getElementById("alertEditor");
       if(editor){
         editor.value = getAlertsText();
+        editor.readOnly = !isAdmin;
       }
     }
 
@@ -659,6 +777,7 @@
       const grid = document.getElementById("postGrid");
       const card = document.getElementById("postCard");
       const topBack = document.getElementById("topBack");
+      const ro = !isAdmin ? "readonly" : "";
 
       grid.style.display = "none";
       card.style.display = "block";
@@ -675,6 +794,7 @@
                 type="text"
                 id="assigned-${index}"
                 value="${escapeHtmlAttr(item[1])}"
+                ${ro}
               />
             </div>
           </div>
@@ -687,9 +807,9 @@
           <div class="count-box">
             <div class="label">Balcony Count Entry</div>
             <div>11:30 AM Count</div>
-            <input type="text" id="count1Input" value="${escapeHtmlAttr(post.count1 || "")}" />
+            <input type="text" id="count1Input" value="${escapeHtmlAttr(post.count1 || "")}" ${ro} />
             <div>1:50 PM Count</div>
-            <input type="text" id="count2Input" value="${escapeHtmlAttr(post.count2 || "")}" />
+            <input type="text" id="count2Input" value="${escapeHtmlAttr(post.count2 || "")}" ${ro} />
           </div>
         `;
       }
@@ -702,7 +822,7 @@
 
           <div class="section-box details-box">
             <div class="label">Post Details</div>
-            <textarea id="detailsInput">${escapeHtmlText(post.details || "")}</textarea>
+            <textarea id="detailsInput" ${ro}>${escapeHtmlText(post.details || "")}</textarea>
           </div>
 
           <div class="section-box">
@@ -725,19 +845,24 @@
 
           <div class="notes">
             <strong>Captain Notes</strong>
-            <textarea id="notesInput">${escapeHtmlText(post.notes || "")}</textarea>
+            <textarea id="notesInput" ${ro}>${escapeHtmlText(post.notes || "")}</textarea>
           </div>
 
           ${countHTML}
 
           <div class="action-row">
-            <div class="save" onclick="savePost(${num})">Save Changes</div>
+            ${isAdmin
+              ? `<div class="save" onclick="savePost(${num})">Save Changes</div>`
+              : `<div class="save disabled">View Only</div>`
+            }
           </div>
         </div>
       `;
     }
 
     function savePost(num){
+      if(!isAdmin) return;
+
       const post = posts[num];
 
       const detailsInput = document.getElementById("detailsInput");
@@ -788,10 +913,61 @@
         .replace(/>/g, "&gt;");
     }
 
+    async function shareBoard(){
+      const cleanUrl = window.location.origin + window.location.pathname;
+
+      try{
+        if(navigator.share){
+          await navigator.share({
+            title: "Mililani Attendant Captain",
+            text: "View the board",
+            url: cleanUrl
+          });
+        }else if(navigator.clipboard){
+          await navigator.clipboard.writeText(cleanUrl);
+          alert("Link copied");
+        }else{
+          prompt("Copy this link:", cleanUrl);
+        }
+      }catch(e){}
+    }
+
+    function printBoard(){
+      window.print();
+    }
+
+    function applyAdminUi(){
+      const modeNote = document.getElementById("modeNote");
+      const alertActions = document.getElementById("alertActions");
+      const alertHelp = document.getElementById("alertHelp");
+      const editor = document.getElementById("alertEditor");
+
+      if(modeNote){
+        modeNote.textContent = isAdmin
+          ? "Admin mode: editable"
+          : "View mode: shared read-only";
+      }
+
+      if(alertActions){
+        alertActions.style.display = isAdmin ? "flex" : "none";
+      }
+
+      if(alertHelp){
+        alertHelp.textContent = isAdmin
+          ? "One alert per line. Edit anything you like, then save."
+          : "View-only alerts.";
+      }
+
+      if(editor){
+        editor.readOnly = !isAdmin;
+      }
+    }
+
     loadSavedData();
     renderButtons();
     renderAlerts();
     restoreAlertsState();
+    applyAdminUi();
   </script>
 </body>
 </html>

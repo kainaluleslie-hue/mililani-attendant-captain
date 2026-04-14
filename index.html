@@ -432,7 +432,7 @@
           ["9:20 AM – 10:55 AM", "Team B"],
           ["10:55 AM – 12:10 PM", "Team A"],
           ["12:10 PM – 1:25 PM", "Team B (Lunch)"],
-          ["1:25 AM – 2:40 PM", "Team A"],
+          ["1:25 PM – 2:40 PM", "Team A"],
           ["2:40 PM – 3:40 PM", "Team B"],
           ["3:40 PM – TBD", "Team A"]
         ]
@@ -770,18 +770,18 @@
     function goBack(){
       document.getElementById("postCard").style.display = "none";
       document.getElementById("postGrid").style.display = "grid";
-      document.getElementById("topBack
-                              }
+      document.getElementById("topBack").style.display = "none";
+    }
 
     function escapeHtmlText(str){
-      return String(str)
+      return String(str || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
 
     function escapeHtmlAttr(str){
-      return String(str)
+      return String(str || "")
         .replace(/&/g, "&amp;")
         .replace(/"/g, "&quot;")
         .replace(/</g, "&lt;")

@@ -1,148 +1,797 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mililani Attendant Captain</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mililani Attendant Captain</title>
+  <style>
+    :root{
+      --bg:#0f1115;
+      --panel:#181c26;
+      --panel-2:#232938;
+      --panel-3:#1d2433;
+      --header:#151922;
+      --line:#2c3245;
+      --text:#ffffff;
+      --muted:#9aa3b2;
+      --blue:#2d7ff9;
+      --blue-hover:#3b8cff;
+      --button:#2a3145;
+      --button-hover:#35405c;
+      --input-bg:#f4f6fa;
+      --input-text:#111111;
+    }
 
-<style>
-body {
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#0f1115;
-  color:white;
-}
+    *{
+      box-sizing:border-box;
+    }
 
-header {
-  text-align:center;
-  padding:20px;
-  background:#151922;
-}
+    body{
+      margin:0;
+      font-family:Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-.container {
-  padding:20px;
-}
+    header{
+      text-align:center;
+      padding:20px;
+      background:var(--header);
+    }
 
-.post-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
+    h1{
+      margin:0;
+      font-size:28px;
+    }
 
-.post-btn {
-  background:#232938;
-  padding:16px;
-  text-align:center;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-}
+    .sub{
+      color:var(--muted);
+      margin-top:5px;
+    }
 
-.post-btn:hover {
-  background:#2f384f;
-}
+    .container{
+      max-width:960px;
+      margin:0 auto;
+      padding:20px;
+    }
 
-.card {
-  background:#181c26;
-  padding:16px;
-  border-radius:12px;
-}
+    .top-bar{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
 
-textarea, input {
-  width:100%;
-  margin-top:6px;
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:8px;
-  border:none;
-}
+    .back-top{
+      background:var(--blue);
+      padding:16px 26px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:17px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-width:190px;
+      box-shadow:0 4px 10px rgba(0,0,0,.35);
+      transition:background .2s;
+      user-select:none;
+    }
 
-button {
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  background:#2d7ff9;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-</style>
+    .back-top:hover{
+      background:var(--blue-hover);
+    }
+
+    .alert-shell{
+      background:var(--panel);
+      border-radius:12px;
+      margin-bottom:18px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      flex:1;
+      min-width:260px;
+    }
+
+    .alert-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 16px;
+      cursor:pointer;
+      background:#1b2030;
+      font-weight:bold;
+    }
+
+    .alert-body{
+      padding:14px 16px;
+      border-top:1px solid var(--line);
+      display:none;
+    }
+
+    .alert-body.open{
+      display:block;
+    }
+
+    .alert-editor{
+      width:100%;
+      min-height:140px;
+      border:none;
+      border-radius:10px;
+      padding:12px;
+      font-family:Arial,sans-serif;
+      font-size:15px;
+      box-sizing:border-box;
+      resize:vertical;
+      background:var(--input-bg);
+      color:var(--input-text);
+    }
+
+    .alert-help{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .alert-actions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+
+    .alert-btn{
+      background:var(--panel-2);
+      border-radius:8px;
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:bold;
+      user-select:none;
+    }
+
+    .alert-btn.primary{
+      background:var(--blue);
+    }
+
+    .alert-btn:hover{
+      filter:brightness(1.08);
+    }
+
+    .post-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .post-btn{
+      background:var(--panel-2);
+      padding:16px 14px;
+      border-radius:10px;
+      text-align:center;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:18px;
+      box-shadow:0 2px 8px rgba(0,0,0,.2);
+      user-select:none;
+    }
+
+    .post-btn:hover{
+      background:#2f384f;
+    }
+
+    .card{
+      background:var(--panel);
+      padding:18px;
+      border-radius:12px;
+      margin-top:20px;
+    }
+
+    .card h2{
+      margin-top:0;
+      margin-bottom:14px;
+      font-size:24px;
+    }
+
+    .section-box{
+      background:var(--panel-2);
+      padding:14px;
+      border-radius:10px;
+      margin-top:14px;
+    }
+
+    .label{
+      font-weight:bold;
+      margin-bottom:8px;
+      font-size:15px;
+    }
+
+    .details-box textarea,
+    .notes textarea{
+      width:100%;
+      border:none;
+      border-radius:8px;
+      padding:10px;
+      font-family:Arial,sans-serif;
+      font-size:15px;
+      box-sizing:border-box;
+      resize:vertical;
+      background:var(--input-bg);
+      color:var(--input-text);
+    }
+
+    .details-box textarea{
+      min-height:70px;
+    }
+
+    .schedule-wrap{
+      margin-top:8px;
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid var(--line);
+    }
+
+    .schedule-head{
+      display:grid;
+      grid-template-columns:1.15fr 1fr;
+      gap:12px;
+      background:#1c2231;
+      padding:12px 14px;
+      font-weight:bold;
+      border-bottom:1px solid var(--line);
+    }
+
+    .shift-row{
+      display:grid;
+      grid-template-columns:1.15fr 1fr;
+      gap:12px;
+      padding:10px 14px;
+      border-bottom:1px solid var(--line);
+      align-items:center;
+    }
+
+    .shift-row:last-child{
+      border-bottom:none;
+    }
+
+    .shift-row:nth-child(odd){
+      background:var(--panel-2);
+    }
+
+    .shift-row:nth-child(even){
+      background:var(--panel-3);
+    }
+
+    .time-cell{
+      font-weight:bold;
+      color:#f1f3f7;
+    }
+
+    .assigned-input{
+      width:100%;
+      border:none;
+      border-radius:8px;
+      padding:10px;
+      font-family:Arial,sans-serif;
+      font-size:15px;
+      box-sizing:border-box;
+      background:var(--input-bg);
+      color:var(--input-text);
+    }
+
+    .map{
+      margin-top:14px;
+    }
+
+    .map-wrap{
+      width:100%;
+      border-radius:10px;
+      overflow:hidden;
+      background:#ffffff;
+      border:1px solid rgba(0,0,0,.08);
+    }
+
+    .map-wrap img{
+      width:100%;
+      display:block;
+      border-radius:10px;
+    }
+
+    .notes{
+      margin-top:14px;
+      background:var(--panel-2);
+      padding:12px;
+      border-radius:10px;
+      line-height:1.5;
+    }
+
+    .notes textarea{
+      margin-top:10px;
+      min-height:110px;
+    }
+
+    .count-box{
+      margin-top:14px;
+      background:var(--panel-2);
+      padding:12px;
+      border-radius:10px;
+    }
+
+    .count-box input{
+      width:100%;
+      margin-top:8px;
+      margin-bottom:10px;
+      padding:10px;
+      border:none;
+      border-radius:8px;
+      box-sizing:border-box;
+      font-size:14px;
+      background:var(--input-bg);
+      color:var(--input-text);
+    }
+
+    .action-row{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .save{
+      flex:1;
+      padding:14px 12px;
+      text-align:center;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:bold;
+      background:var(--button);
+      user-select:none;
+    }
+
+    .save:hover{
+      background:var(--button-hover);
+    }
+
+    @media (max-width:700px){
+      .post-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      .schedule-head,
+      .shift-row{
+        grid-template-columns:1fr;
+      }
+
+      .back-top{
+        min-width:100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <h1>Mililani Attendant Captain</h1>
+    <div class="sub">239 Palii Street, Mililani HI 96789</div>
+  </header>
 
-<header>
-<h1>Mililani Attendant Captain</h1>
-<div>239 Palii Street, Mililani HI 96789</div>
-</header>
+  <div class="container">
+    <div class="top-bar">
+      <div class="back-top" onclick="goBack()" id="topBack" style="display:none;">
+        ← Back to Posts
+      </div>
 
-<div class="container">
-
-<div id="postGrid" class="post-grid"></div>
-
-<div id="postCard" style="display:none;"></div>
-
-</div>
-
-<script>
-
-const posts = {
-1:{title:"Post 1 – Lobby Entrance"},
-2:{title:"Post 2 – Auditorium Entrance"},
-3:{title:"Post 3 – Left Auditorium"},
-4:{title:"Post 4 – Right Auditorium"},
-5:{title:"Post 5 – KH A Hallway"},
-6:{title:"Post 6 – Basement Stairs"},
-7:{title:"Post 7 – Top of Stairs"},
-8:{title:"Post 8 – Balcony Elevator"},
-9:{title:"Post 9 – Balcony"}
-};
-
-function renderButtons(){
-  const grid = document.getElementById("postGrid");
-  grid.innerHTML = "";
-
-  for(let i=1;i<=9;i++){
-    const btn = document.createElement("div");
-    btn.className = "post-btn";
-    btn.textContent = "Post " + i;
-    btn.onclick = function(){
-      openPost(i);
-    };
-    grid.appendChild(btn);
-  }
-}
-
-function openPost(num){
-  const grid = document.getElementById("postGrid");
-  const card = document.getElementById("postCard");
-
-  grid.style.display="none";
-  card.style.display="block";
-
-  card.innerHTML = `
-    <div class="card">
-      <h2>${posts[num].title}</h2>
-
-      <label>Details</label>
-      <textarea id="details"></textarea>
-
-      <label>Notes</label>
-      <textarea id="notes"></textarea>
-
-      <button onclick="goBack()">Back</button>
+      <div class="alert-shell">
+        <div class="alert-header" onclick="toggleAlerts()">
+          <div>Captain Alerts</div>
+          <div id="alertChevron">▾</div>
+        </div>
+        <div class="alert-body" id="alertBody">
+          <textarea id="alertEditor" class="alert-editor"></textarea>
+          <div class="alert-help">One alert per line. Edit anything you like, then save.</div>
+          <div class="alert-actions">
+            <div class="alert-btn primary" onclick="saveAlerts()">Save Alerts</div>
+            <div class="alert-btn" onclick="resetAlerts()">Reset Default Alerts</div>
+          </div>
+        </div>
+      </div>
     </div>
-  `;
-}
 
-function goBack(){
-  document.getElementById("postCard").style.display="none";
-  document.getElementById("postGrid").style.display="grid";
-}
+    <div id="postGrid" class="post-grid"></div>
+    <div id="postCard" style="display:none;"></div>
+  </div>
 
-renderButtons();
+  <script>
+    const STORAGE_KEY = "mililani-attendant-captain-clean-v1";
+    const ALERTS_KEY = "mililani-attendant-alerts-open-clean";
+    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-clean";
 
-</script>
+    const defaultAlerts = [
+      "Post 6 needs second brother on Al Tiu shifts.",
+      "Post 7 has tentative backup note.",
+      "Balcony counts due at 11:30 AM and 1:50 PM.",
+      "Tap a post to review schedule and location reference."
+    ];
 
+    const imageMap = {
+      1: "groundmap(1).jpg",
+      2: "groundmap(2).jpg",
+      3: "groundmap(3).jpg",
+      4: "groundmap(4).jpg",
+      5: "groundmap(5).jpg",
+      6: "groundmap(6).jpg",
+      7: "groundmap(7).jpg",
+      8: "balconymap(1).jpg",
+      9: "balconymap(2).jpg"
+    };
+
+    const posts = {
+      1: {
+        title: "Post 1 – Lobby Entrance",
+        details: "2 Brothers Required",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Team A"],
+          ["9:20 AM – 10:55 AM", "Team B"],
+          ["10:55 AM – 12:10 PM", "Team A"],
+          ["12:10 PM – 1:25 PM", "Team B (Lunch)"],
+          ["1:25 AM – 2:40 PM", "Team A"],
+          ["2:40 PM – 3:40 PM", "Team B"],
+          ["3:40 PM – TBD", "Team A"]
+        ]
+      },
+      2: {
+        title: "Post 2 – Auditorium Entrance",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Erwin Pascua"],
+          ["9:20 AM – 10:55 AM", "Mark Foster"],
+          ["10:55 AM – 12:10 PM", "Erwin Pascua"],
+          ["12:10 PM – 1:25 PM", "Mark Foster (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Erwin Pascua"],
+          ["2:40 PM – 3:40 PM", "Mark Foster"],
+          ["3:40 PM – TBD", "Erwin Pascua"]
+        ]
+      },
+      3: {
+        title: "Post 3 – Left Auditorium",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Kawika Delacruz"],
+          ["9:20 AM – 10:55 AM", "Norman Ho'omanawanui"],
+          ["10:55 AM – 12:10 PM", "Kawika Delacruz"],
+          ["12:10 PM – 1:25 PM", "Norman Ho'omanawanui (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Kawika Delacruz"],
+          ["2:40 PM – 3:40 PM", "Norman Ho'omanawanui"],
+          ["3:40 PM – TBD", "Kawika Delacruz"]
+        ]
+      },
+      4: {
+        title: "Post 4 – Right Auditorium",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Hiland Itelmong"],
+          ["9:20 AM – 10:55 AM", "Jourdan Manta"],
+          ["10:55 AM – 12:10 PM", "Hiland Itelmong"],
+          ["12:10 PM – 1:25 PM", "Jourdan Manta (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Hiland Itelmong"],
+          ["2:40 PM – 3:40 PM", "Jourdan Manta"],
+          ["3:40 PM – TBD", "Hiland Itelmong"]
+        ]
+      },
+      5: {
+        title: "Post 5 – KH A Hallway",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Logan Griffin"],
+          ["9:20 AM – 10:55 AM", "Rodney Bristol"],
+          ["10:55 AM – 12:10 PM", "Logan Griffin"],
+          ["12:10 PM – 1:25 PM", "Rodney Bristol (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Logan Griffin"],
+          ["2:40 PM – 3:40 PM", "Rodney Bristol"],
+          ["3:40 PM – TBD", "Logan Griffin"]
+        ]
+      },
+      6: {
+        title: "Post 6 – Basement Stairs",
+        details: "2 Brothers Required",
+        notes: "",
+        schedule: [
+          ["6:45 AM – 7:45 AM", "Kepa Apolo & Zechariah Tubon"],
+          ["7:45 AM – 9:20 AM", "Al Tiu &"],
+          ["9:20 AM – 10:55 AM", "Kepa Apolo & Zechariah Tubon"],
+          ["10:55 AM – 12:10 PM", "Al Tiu &"],
+          ["12:10 PM – 1:25 PM", "Kepa Apolo & Zechariah Tubon (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Al Tiu &"],
+          ["2:40 PM – 3:40 PM", "Kepa Apolo & Zechariah Tubon"],
+          ["3:40 PM – TBD", "Al Tiu &"]
+        ]
+      },
+      7: {
+        title: "Post 7 – Top of Stairs",
+        details: "Tentative Backup:",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "David Yamashita"],
+          ["9:20 AM – 10:55 AM", "Sean Yarbenet"],
+          ["10:55 AM – 12:10 PM", "David Yamashita"],
+          ["12:10 PM – 1:25 PM", "Sean Yarbenet (Lunch)"],
+          ["1:25 PM – 2:40 PM", "David Yamashita"],
+          ["2:40 PM – 3:40 PM", "Sean Yarbenet"],
+          ["3:40 PM – TBD", "David Yamashita"]
+        ]
+      },
+      8: {
+        title: "Post 8 – Elevator Area (Balcony Level)",
+        details: "",
+        notes: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Jordan Moananu"],
+          ["9:20 AM – 10:55 AM", "Dennis Maeda"],
+          ["10:55 AM – 12:10 PM", "Jordan Moananu"],
+          ["12:10 PM – 1:25 PM", "Dennis Maeda (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Jordan Moananu"],
+          ["2:40 PM – 3:40 PM", "Dennis Maeda"],
+          ["3:40 PM – TBD", "Jordan Moananu"]
+        ]
+      },
+      9: {
+        title: "Post 9 – Balcony",
+        details: "Balcony attendance count times:\nCount #1 — 11:30 AM\nCount #2 — 1:50 PM\nSend totals to Captain",
+        notes: "",
+        count1: "",
+        count2: "",
+        schedule: [
+          ["7:45 AM – 9:20 AM", "Nainoa Driver"],
+          ["9:20 AM – 10:55 AM", "Joey Cariaga"],
+          ["10:55 AM – 12:10 PM", "Nainoa Driver"],
+          ["12:10 PM – 1:25 PM", "Joey Cariaga (Lunch)"],
+          ["1:25 PM – 2:40 PM", "Nainoa Driver"],
+          ["2:40 PM – 3:40 PM", "Joey Cariaga"],
+          ["3:40 PM – TBD", "Nainoa Driver"]
+        ]
+      }
+    };
+
+    function loadSavedData(){
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if(!saved) return;
+
+      try{
+        const parsed = JSON.parse(saved);
+        Object.keys(parsed).forEach(function(key){
+          if(posts[key]){
+            posts[key].details = parsed[key].details !== undefined ? parsed[key].details : posts[key].details;
+            posts[key].notes = parsed[key].notes || "";
+            posts[key].schedule = parsed[key].schedule || posts[key].schedule;
+            if(posts[key].count1 !== undefined){
+              posts[key].count1 = parsed[key].count1 || "";
+              posts[key].count2 = parsed[key].count2 || "";
+            }
+          }
+        });
+      }catch(e){}
+    }
+
+    function saveData(){
+      const payload = {};
+      Object.keys(posts).forEach(function(key){
+        payload[key] = {
+          details: posts[key].details || "",
+          notes: posts[key].notes || "",
+          schedule: posts[key].schedule || [],
+          count1: posts[key].count1 || "",
+          count2: posts[key].count2 || ""
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }
+
+    function getAlertsText(){
+      return localStorage.getItem(ALERTS_TEXT_KEY) || defaultAlerts.join("\n");
+    }
+
+    function saveAlerts(){
+      const editor = document.getElementById("alertEditor");
+      if(!editor) return;
+      localStorage.setItem(ALERTS_TEXT_KEY, editor.value);
+      alert("Captain Alerts saved");
+    }
+
+    function resetAlerts(){
+      const text = defaultAlerts.join("\n");
+      localStorage.setItem(ALERTS_TEXT_KEY, text);
+      const editor = document.getElementById("alertEditor");
+      if(editor){
+        editor.value = text;
+      }
+      alert("Captain Alerts reset");
+    }
+
+    function renderAlerts(){
+      const editor = document.getElementById("alertEditor");
+      if(editor){
+        editor.value = getAlertsText();
+      }
+    }
+
+    function toggleAlerts(){
+      const body = document.getElementById("alertBody");
+      const chev = document.getElementById("alertChevron");
+      body.classList.toggle("open");
+      const isOpen = body.classList.contains("open");
+      chev.textContent = isOpen ? "▴" : "▾";
+      localStorage.setItem(ALERTS_KEY, isOpen ? "open" : "closed");
+    }
+
+    function restoreAlertsState(){
+      const state = localStorage.getItem(ALERTS_KEY);
+      const body = document.getElementById("alertBody");
+      const chev = document.getElementById("alertChevron");
+
+      if(state === "open"){
+        body.classList.add("open");
+        chev.textContent = "▴";
+      }else{
+        body.classList.remove("open");
+        chev.textContent = "▾";
+      }
+    }
+
+    function renderButtons(){
+      const grid = document.getElementById("postGrid");
+      grid.innerHTML = "";
+
+      for(let i = 1; i <= 9; i++){
+        const btn = document.createElement("div");
+        btn.className = "post-btn";
+        btn.textContent = "Post " + i;
+        btn.onclick = function(){
+          openPost(i);
+        };
+        grid.appendChild(btn);
+      }
+    }
+
+    function openPost(num){
+      const post = posts[num];
+      const grid = document.getElementById("postGrid");
+      const card = document.getElementById("postCard");
+      const topBack = document.getElementById("topBack");
+
+      grid.style.display = "none";
+      card.style.display = "block";
+      topBack.style.display = "flex";
+
+      let scheduleHTML = "";
+      post.schedule.forEach(function(item, index){
+        scheduleHTML += `
+          <div class="shift-row">
+            <div class="time-cell">${escapeHtmlText(item[0])}</div>
+            <div>
+              <input
+                class="assigned-input"
+                type="text"
+                id="assigned-${index}"
+                value="${escapeHtmlAttr(item[1])}"
+              />
+            </div>
+          </div>
+        `;
+      });
+
+      let countHTML = "";
+      if(num === 9){
+        countHTML = `
+          <div class="count-box">
+            <div class="label">Balcony Count Entry</div>
+            <div>11:30 AM Count</div>
+            <input type="text" id="count1Input" value="${escapeHtmlAttr(post.count1 || "")}" />
+            <div>1:50 PM Count</div>
+            <input type="text" id="count2Input" value="${escapeHtmlAttr(post.count2 || "")}" />
+          </div>
+        `;
+      }
+
+      const mapFile = imageMap[num];
+
+      card.innerHTML = `
+        <div class="card">
+          <h2>${escapeHtmlText(post.title)}</h2>
+
+          <div class="section-box details-box">
+            <div class="label">Post Details</div>
+            <textarea id="detailsInput">${escapeHtmlText(post.details || "")}</textarea>
+          </div>
+
+          <div class="section-box">
+            <div class="label">Shift Times / Assigned</div>
+            <div class="schedule-wrap">
+              <div class="schedule-head">
+                <div>Shift Time</div>
+                <div>Assigned</div>
+              </div>
+              ${scheduleHTML}
+            </div>
+          </div>
+
+          <div class="map">
+            <div class="label">Post Location Reference</div>
+            <div class="map-wrap">
+              <img src="${mapFile}" alt="${escapeHtmlAttr(post.title)} map">
+            </div>
+          </div>
+
+          <div class="notes">
+            <strong>Captain Notes</strong>
+            <textarea id="notesInput">${escapeHtmlText(post.notes || "")}</textarea>
+          </div>
+
+          ${countHTML}
+
+          <div class="action-row">
+            <div class="save" onclick="savePost(${num})">Save Changes</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function savePost(num){
+      const post = posts[num];
+
+      const detailsInput = document.getElementById("detailsInput");
+      const notesInput = document.getElementById("notesInput");
+
+      if(detailsInput){
+        post.details = detailsInput.value;
+      }
+
+      if(notesInput){
+        post.notes = notesInput.value;
+      }
+
+      post.schedule = post.schedule.map(function(item, index){
+        const assignedInput = document.getElementById("assigned-" + index);
+        return [item[0], assignedInput ? assignedInput.value : item[1]];
+      });
+
+      if(num === 9){
+        const c1 = document.getElementById("count1Input");
+        const c2 = document.getElementById("count2Input");
+        post.count1 = c1 ? c1.value : "";
+        post.count2 = c2 ? c2.value : "";
+      }
+
+      saveData();
+      alert("Saved");
+    }
+
+    function goBack(){
+      document.getElementById("postCard").style.display = "none";
+      document.getElementById("postGrid").style.display = "grid";
+      document.getElementById("topBack
+                              }
+
+    function escapeHtmlText(str){
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function escapeHtmlAttr(str){
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    loadSavedData();
+    renderButtons();
+    renderAlerts();
+    restoreAlertsState();
+  </script>
 </body>
 </html>

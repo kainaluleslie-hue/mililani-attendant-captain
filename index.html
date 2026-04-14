@@ -76,6 +76,7 @@
       box-shadow:0 4px 10px rgba(0,0,0,.35);
       transition:background .2s;
       user-select:none;
+      text-align:center;
     }
 
     .utility-btn:hover{
@@ -397,6 +398,12 @@
       cursor:default;
     }
 
+    .loading-bar{
+      margin-bottom:14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
     @media (max-width:700px){
       .post-grid{
         grid-template-columns:repeat(2,1fr);
@@ -429,7 +436,8 @@
 
       .utility-bar,
       .top-bar,
-      #topBack{
+      #topBack,
+      #loadingBar{
         display:none !important;
       }
 
@@ -481,7 +489,10 @@
   </header>
 
   <div class="container">
+    <div class="loading-bar" id="loadingBar">Loading board…</div>
+
     <div class="utility-bar">
+      <div class="utility-btn" id="authButton">Sign In</div>
       <div class="utility-btn secondary" onclick="shareBoard()">Share Link</div>
       <div class="utility-btn secondary" onclick="printBoard()">Print</div>
       <div class="mode-note" id="modeNote"></div>
@@ -512,11 +523,46 @@
     <div id="postCard" style="display:none;"></div>
   </div>
 
-  <script>
-    const STORAGE_KEY = "mililani-attendant-captain-clean-v1";
-    const ALERTS_KEY = "mililani-attendant-alerts-open-clean";
-    const ALERTS_TEXT_KEY = "mililani-attendant-alerts-text-clean";
-    const isAdmin = window.location.search.includes("admin=true");
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDM3hsCFZ7_-PnJqCXgwG7ItawivcVfypc",
+      authDomain: "mililani-attendant-app.firebaseapp.com",
+      projectId: "mililani-attendant-app",
+      storageBucket: "mililani-attendant-app.firebasestorage.app",
+      messagingSenderId: "615437717899",
+      appId: "1:615437717899:web:199b5d400803428fd79f8e"
+    };
+
+    const OWNER_EMAIL = "kainaluleslie@gmail.com";
+    const BOARD_DOC_ID = "mainBoard";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+    const boardRef = doc(db, "boards", BOARD_DOC_ID);
+
+    let currentUser = null;
+    let isOwner = false;
+    let currentPost = null;
+    let boardLoaded = false;
 
     const defaultAlerts = [
       "Post 6 needs second brother on Al Tiu shifts.",
@@ -547,7 +593,7 @@
           ["9:20 AM – 10:55 AM", "Team B"],
           ["10:55 AM – 12:10 PM", "Team A"],
           ["12:10 PM – 1:25 PM", "Team B (Lunch)"],
-          ["1:25 PM – 2:40 PM", "Team A"],
+          ["1:25 AM – 2:40 PM", "Team A"],
           ["2:40 PM – 3:40 PM", "Team B"],
           ["3:40 PM – TBD", "Team A"]
         ]
@@ -669,30 +715,52 @@
       }
     };
 
-    function loadSavedData(){
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if(!saved) return;
+    let alertsText = defaultAlerts.join("\n");
+    let alertsOpen = false;
 
-      try{
-        const parsed = JSON.parse(saved);
-        Object.keys(parsed).forEach(function(key){
+    function getDefaultPayload(){
+      return {
+        alertsText: defaultAlerts.join("\n"),
+        alertsOpen: false,
+        posts: JSON.parse(JSON.stringify(posts)),
+        updatedAt: serverTimestamp()
+      };
+    }
+
+    async function ensureBoardExists(){
+      const snap = await getDoc(boardRef);
+      if(!snap.exists()){
+        await setDoc(boardRef, getDefaultPayload());
+      }
+    }
+
+    function applyBoardData(data){
+      alertsText = typeof data.alertsText === "string" ? data.alertsText : defaultAlerts.join("\n");
+      alertsOpen = !!data.alertsOpen;
+
+      if(data.posts){
+        Object.keys(data.posts).forEach(function(key){
           if(posts[key]){
-            posts[key].details = parsed[key].details !== undefined ? parsed[key].details : posts[key].details;
-            posts[key].notes = parsed[key].notes || "";
-            posts[key].schedule = parsed[key].schedule || posts[key].schedule;
+            const src = data.posts[key];
+            posts[key].title = src.title ?? posts[key].title;
+            posts[key].details = src.details ?? posts[key].details;
+            posts[key].notes = src.notes ?? posts[key].notes;
+            posts[key].schedule = Array.isArray(src.schedule) ? src.schedule : posts[key].schedule;
             if(posts[key].count1 !== undefined){
-              posts[key].count1 = parsed[key].count1 || "";
-              posts[key].count2 = parsed[key].count2 || "";
+              posts[key].count1 = src.count1 ?? "";
+              posts[key].count2 = src.count2 ?? "";
             }
           }
         });
-      }catch(e){}
+      }
     }
 
-    function saveData(){
-      const payload = {};
+    function buildBoardPayload(){
+      const payloadPosts = {};
+
       Object.keys(posts).forEach(function(key){
-        payload[key] = {
+        payloadPosts[key] = {
+          title: posts[key].title || "",
           details: posts[key].details || "",
           notes: posts[key].notes || "",
           schedule: posts[key].schedule || [],
@@ -700,61 +768,33 @@
           count2: posts[key].count2 || ""
         };
       });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+
+      return {
+        alertsText,
+        alertsOpen,
+        posts: payloadPosts,
+        updatedAt: serverTimestamp()
+      };
     }
 
-    function getAlertsText(){
-      return localStorage.getItem(ALERTS_TEXT_KEY) || defaultAlerts.join("\n");
+    async function saveBoard(){
+      if(!isOwner) return;
+      await setDoc(boardRef, buildBoardPayload(), { merge: true });
     }
 
-    function saveAlerts(){
-      if(!isAdmin) return;
-      const editor = document.getElementById("alertEditor");
-      if(!editor) return;
-      localStorage.setItem(ALERTS_TEXT_KEY, editor.value);
-      alert("Captain Alerts saved");
+    function escapeHtmlText(str){
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
-    function resetAlerts(){
-      if(!isAdmin) return;
-      const text = defaultAlerts.join("\n");
-      localStorage.setItem(ALERTS_TEXT_KEY, text);
-      const editor = document.getElementById("alertEditor");
-      if(editor){
-        editor.value = text;
-      }
-      alert("Captain Alerts reset");
-    }
-
-    function renderAlerts(){
-      const editor = document.getElementById("alertEditor");
-      if(editor){
-        editor.value = getAlertsText();
-        editor.readOnly = !isAdmin;
-      }
-    }
-
-    function toggleAlerts(){
-      const body = document.getElementById("alertBody");
-      const chev = document.getElementById("alertChevron");
-      body.classList.toggle("open");
-      const isOpen = body.classList.contains("open");
-      chev.textContent = isOpen ? "▴" : "▾";
-      localStorage.setItem(ALERTS_KEY, isOpen ? "open" : "closed");
-    }
-
-    function restoreAlertsState(){
-      const state = localStorage.getItem(ALERTS_KEY);
-      const body = document.getElementById("alertBody");
-      const chev = document.getElementById("alertChevron");
-
-      if(state === "open"){
-        body.classList.add("open");
-        chev.textContent = "▴";
-      }else{
-        body.classList.remove("open");
-        chev.textContent = "▾";
-      }
+    function escapeHtmlAttr(str){
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
 
     function renderButtons(){
@@ -772,12 +812,72 @@
       }
     }
 
+    function renderAlerts(){
+      const editor = document.getElementById("alertEditor");
+      const body = document.getElementById("alertBody");
+      const chev = document.getElementById("alertChevron");
+      const help = document.getElementById("alertHelp");
+      const actions = document.getElementById("alertActions");
+
+      if(editor){
+        editor.value = alertsText;
+        editor.readOnly = !isOwner;
+      }
+
+      if(body){
+        body.classList.toggle("open", alertsOpen);
+      }
+
+      if(chev){
+        chev.textContent = alertsOpen ? "▴" : "▾";
+      }
+
+      if(help){
+        help.textContent = isOwner
+          ? "One alert per line. Edit anything you like, then save."
+          : "View-only alerts.";
+      }
+
+      if(actions){
+        actions.style.display = isOwner ? "flex" : "none";
+      }
+    }
+
+    function updateOwnerUi(){
+      const authButton = document.getElementById("authButton");
+      const modeNote = document.getElementById("modeNote");
+
+      if(authButton){
+        authButton.textContent = isOwner ? "Sign Out" : "Sign In";
+        authButton.onclick = async function(){
+          try{
+            if(isOwner){
+              await signOut(auth);
+            }else{
+              await signInWithPopup(auth, provider);
+            }
+          }catch(error){
+            console.error(error);
+            alert("Sign-in failed");
+          }
+        };
+      }
+
+      if(modeNote){
+        modeNote.textContent = isOwner
+          ? `Owner mode: ${currentUser?.email || ""}`
+          : "View mode: shared read-only";
+      }
+    }
+
     function openPost(num){
+      currentPost = num;
+
       const post = posts[num];
       const grid = document.getElementById("postGrid");
       const card = document.getElementById("postCard");
       const topBack = document.getElementById("topBack");
-      const ro = !isAdmin ? "readonly" : "";
+      const ro = !isOwner ? "readonly" : "";
 
       grid.style.display = "none";
       card.style.display = "block";
@@ -851,7 +951,7 @@
           ${countHTML}
 
           <div class="action-row">
-            ${isAdmin
+            ${isOwner
               ? `<div class="save" onclick="savePost(${num})">Save Changes</div>`
               : `<div class="save disabled">View Only</div>`
             }
@@ -860,8 +960,8 @@
       `;
     }
 
-    function savePost(num){
-      if(!isAdmin) return;
+    async function savePost(num){
+      if(!isOwner) return;
 
       const post = posts[num];
 
@@ -888,29 +988,58 @@
         post.count2 = c2 ? c2.value : "";
       }
 
-      saveData();
-      alert("Saved");
+      try{
+        await saveBoard();
+        alert("Saved");
+      }catch(error){
+        console.error(error);
+        alert("Save failed");
+      }
+    }
+
+    async function saveAlerts(){
+      if(!isOwner) return;
+      const editor = document.getElementById("alertEditor");
+      if(!editor) return;
+
+      alertsText = editor.value;
+
+      try{
+        await saveBoard();
+        alert("Captain Alerts saved");
+      }catch(error){
+        console.error(error);
+        alert("Save failed");
+      }
+    }
+
+    async function resetAlerts(){
+      if(!isOwner) return;
+      alertsText = defaultAlerts.join("\n");
+      const editor = document.getElementById("alertEditor");
+      if(editor){
+        editor.value = alertsText;
+      }
+
+      try{
+        await saveBoard();
+        alert("Captain Alerts reset");
+      }catch(error){
+        console.error(error);
+        alert("Save failed");
+      }
+    }
+
+    function toggleAlerts(){
+      alertsOpen = !alertsOpen;
+      renderAlerts();
     }
 
     function goBack(){
+      currentPost = null;
       document.getElementById("postCard").style.display = "none";
       document.getElementById("postGrid").style.display = "grid";
       document.getElementById("topBack").style.display = "none";
-    }
-
-    function escapeHtmlText(str){
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
-    function escapeHtmlAttr(str){
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
     }
 
     async function shareBoard(){
@@ -936,38 +1065,54 @@
       window.print();
     }
 
-    function applyAdminUi(){
-      const modeNote = document.getElementById("modeNote");
-      const alertActions = document.getElementById("alertActions");
-      const alertHelp = document.getElementById("alertHelp");
-      const editor = document.getElementById("alertEditor");
+    function renderAll(){
+      renderButtons();
+      renderAlerts();
+      updateOwnerUi();
 
-      if(modeNote){
-        modeNote.textContent = isAdmin
-          ? "Admin mode: editable"
-          : "View mode: shared read-only";
+      if(currentPost !== null){
+        openPost(currentPost);
       }
 
-      if(alertActions){
-        alertActions.style.display = isAdmin ? "flex" : "none";
-      }
-
-      if(alertHelp){
-        alertHelp.textContent = isAdmin
-          ? "One alert per line. Edit anything you like, then save."
-          : "View-only alerts.";
-      }
-
-      if(editor){
-        editor.readOnly = !isAdmin;
-      }
+      document.getElementById("loadingBar").style.display = boardLoaded ? "none" : "block";
     }
 
-    loadSavedData();
-    renderButtons();
-    renderAlerts();
-    restoreAlertsState();
-    applyAdminUi();
+    onAuthStateChanged(auth, async function(user){
+      currentUser = user || null;
+      isOwner = !!(user && user.email && user.email.toLowerCase() === OWNER_EMAIL);
+      renderAll();
+
+      if(isOwner){
+        try{
+          await ensureBoardExists();
+        }catch(error){
+          console.error(error);
+        }
+      }
+    });
+
+    onSnapshot(boardRef, function(docSnap){
+      if(docSnap.exists()){
+        applyBoardData(docSnap.data());
+      }
+      boardLoaded = true;
+      renderAll();
+    }, function(error){
+      console.error(error);
+      boardLoaded = true;
+      renderAll();
+      alert("Could not load live board data");
+    });
+
+    renderAll();
+
+    window.savePost = savePost;
+    window.saveAlerts = saveAlerts;
+    window.resetAlerts = resetAlerts;
+    window.toggleAlerts = toggleAlerts;
+    window.goBack = goBack;
+    window.shareBoard = shareBoard;
+    window.printBoard = printBoard;
   </script>
 </body>
 </html>

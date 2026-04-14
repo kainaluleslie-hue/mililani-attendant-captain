@@ -526,13 +526,16 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
     import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+      initializeAuth,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      getRedirectResult,
+      signOut,
+      onAuthStateChanged,
+      indexedDBLocalPersistence,
+      browserLocalPersistence,
+      browserPopupRedirectResolver
+    } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
     import {
       getFirestore,
       doc,
@@ -555,9 +558,12 @@
     const BOARD_DOC_ID = "mainBoard";
 
     const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+    const auth = initializeAuth(app, {
+      persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+      popupRedirectResolver: browserPopupRedirectResolver
+    });
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
     const boardRef = doc(db, "boards", BOARD_DOC_ID);
 
     let currentUser = null;
@@ -666,7 +672,7 @@ const provider = new GoogleAuthProvider();
           ["9:20 AM – 10:55 AM", "Kepa Apolo & Zechariah Tubon"],
           ["10:55 AM – 12:10 PM", "Al Tiu &"],
           ["12:10 PM – 1:25 PM", "Kepa Apolo & Zechariah Tubon (Lunch)"],
-          ["1:25 PM – 2:40 PM", "Al Tiu &"],
+          ["1:25 AM – 2:40 PM", "Al Tiu &"],
           ["2:40 PM – 3:40 PM", "Kepa Apolo & Zechariah Tubon"],
           ["3:40 PM – TBD", "Al Tiu &"]
         ]
@@ -857,15 +863,15 @@ const provider = new GoogleAuthProvider();
         authButton.textContent = isOwner ? "Sign Out" : "Sign In";
         authButton.onclick = async function(){
           try{
-        if(isOwner){
-          await signOut(auth);
-        }else{
-          await signInWithRedirect(auth, provider);
-        }
-      }catch(error){
-        console.error(error);
-        alert((error.code || "unknown") + "\n\n" + (error.message || "No message"));
-      }
+            if(isOwner){
+              await signOut(auth);
+            }else{
+              await signInWithRedirect(auth, provider);
+            }
+          }catch(error){
+            console.error(error);
+            alert("Sign-in failed:\n" + (error?.code || "") + "\n" + (error?.message || ""));
+          }
         };
       }
 
@@ -1092,13 +1098,14 @@ const provider = new GoogleAuthProvider();
       await getRedirectResult(auth);
     }catch(error){
       console.error(error);
+      alert("Redirect error:\n" + (error?.code || "") + "\n" + (error?.message || ""));
     }
 
     onAuthStateChanged(auth, async function(user){
       currentUser = user || null;
-const signedInEmail = user && user.email ? user.email.toLowerCase().trim() : "";
-const ownerEmail = OWNER_EMAIL.toLowerCase().trim();
-isOwner = signedInEmail === ownerEmail;
+      const signedInEmail = user && user.email ? user.email.toLowerCase().trim() : "";
+      const ownerEmail = OWNER_EMAIL.toLowerCase().trim();
+      isOwner = signedInEmail === ownerEmail;
       authReady = true;
       renderAll();
 
@@ -1136,17 +1143,3 @@ isOwner = signedInEmail === ownerEmail;
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

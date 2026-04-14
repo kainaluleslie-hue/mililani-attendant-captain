@@ -861,15 +861,15 @@
         authButton.textContent = isOwner ? "Sign Out" : "Sign In";
         authButton.onclick = async function(){
           try{
-            if(isOwner){
-              await signOut(auth);
-            }else{
-              await signInWithRedirect(auth, provider);
-            }
-          }catch(error){
-            console.error(error);
-            alert("Sign-in failed");
-          }
+        if(isOwner){
+          await signOut(auth);
+        }else{
+          await signInWithRedirect(auth, provider);
+        }
+      }catch(error){
+        console.error(error);
+        alert((error.code || "unknown") + "\n\n" + (error.message || "No message"));
+      }
         };
       }
 

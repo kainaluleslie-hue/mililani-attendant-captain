@@ -1002,7 +1002,7 @@
         alert("Saved");
       }catch(error){
         console.error(error);
-        alert("Save failed");
+        alert("Save failed:\n" + (error?.code || "") + "\n" + (error?.message || ""));
       }
     }
 
@@ -1018,7 +1018,7 @@
         alert("Captain Alerts saved");
       }catch(error){
         console.error(error);
-        alert("Save failed");
+        alert("Save failed:\n" + (error?.code || "") + "\n" + (error?.message || ""));;
       }
     }
 
@@ -1035,7 +1035,7 @@
         alert("Captain Alerts reset");
       }catch(error){
         console.error(error);
-        alert("Save failed");
+        alert("Save failed:\n" + (error?.code || "") + "\n" + (error?.message || ""));
       }
     }
 

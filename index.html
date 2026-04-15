@@ -751,7 +751,14 @@
             posts[key].title = src.title ?? posts[key].title;
             posts[key].details = src.details ?? posts[key].details;
             posts[key].notes = src.notes ?? posts[key].notes;
-            posts[key].schedule = Array.isArray(src.schedule) ? src.schedule : posts[key].schedule;
+          posts[key].schedule = Array.isArray(src.schedule)
+  ? src.schedule.map(function(item){
+      if(Array.isArray(item)){
+        return item;
+      }
+      return [item.time || "", item.assigned || ""];
+    })
+  : posts[key].schedule;
             if(posts[key].count1 !== undefined){
               posts[key].count1 = src.count1 ?? "";
               posts[key].count2 = src.count2 ?? "";
@@ -762,27 +769,31 @@
     }
 
     function buildBoardPayload(){
-      const payloadPosts = {};
+  const payloadPosts = {};
 
-      Object.keys(posts).forEach(function(key){
-        payloadPosts[key] = {
-          title: posts[key].title || "",
-          details: posts[key].details || "",
-          notes: posts[key].notes || "",
-          schedule: posts[key].schedule || [],
-          count1: posts[key].count1 || "",
-          count2: posts[key].count2 || ""
+  Object.keys(posts).forEach(function(key){
+    payloadPosts[key] = {
+      title: posts[key].title || "",
+      details: posts[key].details || "",
+      notes: posts[key].notes || "",
+      schedule: (posts[key].schedule || []).map(function(item){
+        return {
+          time: item[0] || "",
+          assigned: item[1] || ""
         };
-      });
+      }),
+      count1: posts[key].count1 || "",
+      count2: posts[key].count2 || ""
+    };
+  });
 
-      return {
-        alertsText,
-        alertsOpen,
-        posts: payloadPosts,
-        updatedAt: serverTimestamp()
-      };
-    }
-
+  return {
+    alertsText,
+    alertsOpen,
+    posts: payloadPosts,
+    updatedAt: serverTimestamp()
+  };
+}
     async function saveBoard(){
       if(!isOwner) return;
       await setDoc(boardRef, buildBoardPayload(), { merge: true });

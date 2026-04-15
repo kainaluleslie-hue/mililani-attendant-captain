@@ -527,13 +527,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
     import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithRedirect,
-      getRedirectResult,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
     import {
       getFirestore,
       doc,
@@ -861,7 +860,7 @@
             if(isOwner){
               await signOut(auth);
             }else{
-              await signInWithRedirect(auth, provider);
+             await signInWithPopup(auth, provider);
             }
           }catch(error){
             console.error(error);
@@ -1089,12 +1088,7 @@
       document.getElementById("loadingBar").style.display = boardLoaded ? "none" : "block";
     }
 
-    try{
-      await getRedirectResult(auth);
-    }catch(error){
-      console.error(error);
-      alert("Redirect error:\n" + (error?.code || "") + "\n" + (error?.message || ""));
-    }
+   
 
     onAuthStateChanged(auth, async function(user){
       currentUser = user || null;

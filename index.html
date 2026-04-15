@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mililani Attendant Captain</title>
+  <title>Mililani Attendant Captain App</title>
+
+  <meta property="og:title" content="Mililani Attendant Captain App" />
+  <meta property="og:description" content="Mililani attendant board" />
+  <meta property="og:url" content="https://mililani-attendant-app.web.app/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Mililani Attendant Captain App" />
+
   <link rel="icon" href="data:," />
   <style>
     :root{
@@ -1062,26 +1069,28 @@
       document.getElementById("topBack").style.display = "none";
     }
 
-    async function shareBoard(){
-      const cleanUrl = window.location.origin + window.location.pathname;
+   async function shareBoard(){
+  const cleanUrl = "https://mililani-attendant-app.web.app/";
+  const shareTitle = "Mililani Attendant Captain App";
+  const shareText = "Mililani Attendant Captain App";
 
-      try{
-        if(navigator.share){
-          await navigator.share({
-            title: "Mililani Attendant Captain",
-            text: "View the board",
-            url: cleanUrl
-          });
-        }else if(navigator.clipboard){
-          await navigator.clipboard.writeText(cleanUrl);
-          alert("Link copied");
-        }else{
-          prompt("Copy this link:", cleanUrl);
-        }
-      }catch(error){
-        console.error(error);
-      }
+  try{
+    if(navigator.share){
+      await navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: cleanUrl
+      });
+    }else if(navigator.clipboard){
+      await navigator.clipboard.writeText(`${shareTitle}\n${cleanUrl}`);
+      alert("Link copied");
+    }else{
+      prompt("Copy this link:", cleanUrl);
     }
+  }catch(error){
+    console.error(error);
+  }
+}
 
     function printBoard(){
       window.print();

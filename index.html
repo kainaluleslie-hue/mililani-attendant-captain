@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mililani Attendant Captain</title>
+  <link rel="icon" href="data:," />
   <style>
     :root{
       --bg:#0f1115;
@@ -526,15 +527,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
     import {
-      initializeAuth,
+      getAuth,
       GoogleAuthProvider,
       signInWithRedirect,
       getRedirectResult,
       signOut,
-      onAuthStateChanged,
-      indexedDBLocalPersistence,
-      browserLocalPersistence,
-      browserPopupRedirectResolver
+      onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
     import {
       getFirestore,
@@ -558,10 +556,7 @@
     const BOARD_DOC_ID = "mainBoard";
 
     const app = initializeApp(firebaseConfig);
-    const auth = initializeAuth(app, {
-      persistence: [indexedDBLocalPersistence, browserLocalPersistence],
-      popupRedirectResolver: browserPopupRedirectResolver
-    });
+    const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
     const boardRef = doc(db, "boards", BOARD_DOC_ID);
@@ -1142,4 +1137,4 @@
     window.printBoard = printBoard;
   </script>
 </body>
-</html> 
+</html>
